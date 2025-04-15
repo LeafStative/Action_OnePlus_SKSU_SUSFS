@@ -9,6 +9,11 @@ main() {
         exit 1
     fi
 
+    if [[ ! -f 'out/dist/Image' ]]; then
+        echo 'Kernel image not found! Please build the kernel first.'
+        exit 1
+    fi
+
     mkdir magiskboot_workdir
     pushd magiskboot_workdir
 
@@ -20,6 +25,8 @@ main() {
     popd
 
     rm -rf magiskboot_workdir
+
+    echo 'Patched boot image saved to patched_boot.img'
 }
 
 main $@
