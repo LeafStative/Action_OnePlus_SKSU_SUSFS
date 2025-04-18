@@ -32,6 +32,10 @@ apply_manual_hooks_patches() {
             cp ../../kernel_patches4mksu/next/syscall_hooks.patch ./
             patch -p1 -F 3 < syscall_hooks.patch
             ;;
+        rksu)
+            cp ../../patches/rksu_manual_hooks.patch ./
+            patch -p1 -F 3 < rksu_manual_hooks.patch
+            ;;
         sksu)
             if [[ $SUSFS_ENABLED ]]; then
                 cp ../../patches/sksu_susfs_manual_hooks.patch ./
