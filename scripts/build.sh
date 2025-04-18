@@ -3,12 +3,7 @@
 main() {
     source repo.conf
 
-    local lto
-    if [[ $1 ]]; then
-        lto=$1
-    else
-        lto=thin
-    fi
+    local lto=$( [[ $1 ]] && echo "$1" || echo 'thin' )
 
     if [[ $BAZEL_BUILD == 'true' ]]; then
         ./kernel_platform/build_with_bazel.py -t $CPU_CODENAME gki

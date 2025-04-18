@@ -117,12 +117,10 @@ configure_ksu_version() {
     local ksu_ver
     if [[ $KSU_VER ]]; then
         ksu_ver=$KSU_VER
+    elif [[ $KSU == 'sksu' ]]; then
+        ksu_ver=$(( $(git rev-list --count main) + 10606 ))
     else
-        if [[ $KSU == 'sksu' ]]; then
-            ksu_ver=$(( $(git rev-list --count main) + 10606 ))
-        else
-            ksu_ver=$(( $(git rev-list --count HEAD) + 10200 ))
-        fi
+        ksu_ver=$(( $(git rev-list --count HEAD) + 10200 ))
     fi
 
     sed -i "s/DKSU_VERSION=$default_version/DKSU_VERSION=$ksu_ver/" "$makefile"
