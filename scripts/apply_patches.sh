@@ -45,34 +45,54 @@ apply_manual_hooks_patches() {
     esac
 }
 
-add_susfs_configs() {
+add_ksu_configs() {
+    pushd ./kernel_platform/common
+
     local config_file='./arch/arm64/configs/gki_defconfig'
+    local hook_mode=$( [[ $KSU_MANUAL_HOOKS == true ]] && echo 'manual' || echo 'kprobes' )
+
+    case "$KSU-$hook_mode-$SUSFS_ENABLED" in
+        ksun-manual-*)
+            echo 'CONFIG_KSU_WITH_KPROBES=n' >> $config_file
+            ;;
+        ksun-kprobes-*)
+            echo 'CONFIG_KSU_WITH_KPROBES=y' >> $config_file
+            ;;
+        rksu-manual-*|sksu-manual-true)
+            echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
+            ;;
+        rksu-kprobes-*|sksu-kprobes-true)
+            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+            ;;
+    esac
+
     if [[ $KSU == 'sksu' ]]; then
         echo 'CONFIG_KPM=y' >> $config_file
-        echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
-    else
-        echo 'CONFIG_KSU_WITH_KPROBES=y' >> $config_file
-        # echo 'CONFIG_KSU_WITH_KPROBES=n' >> $config_file
     fi
 
     echo "CONFIG_KSU=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> $config_file
-    echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> $config_file
-    echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> $config_file
+
+    if [[ $SUSFS_ENABLED == true ]]; then
+        echo "CONFIG_KSU_SUSFS=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> $config_file
+        echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> $config_file
+        echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> $config_file
+    fi
+
     sed -i 's/check_defconfig//' ./build.config.gki
+    popd
 }
 
 configure_ksu_version() {
@@ -133,7 +153,6 @@ apply_susfs_patches() {
     patch -p1 -F 3 < 69_hide_stuff.patch
 
     apply_manual_hooks_patches
-    add_susfs_configs
     popd
 
     popd
@@ -149,6 +168,7 @@ main() {
             apply_susfs_patches
         fi
 
+        add_ksu_configs
         configure_ksu_version
     fi
 

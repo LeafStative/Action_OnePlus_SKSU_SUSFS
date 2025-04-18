@@ -6,18 +6,19 @@ USAGE: $0 [OPTION ...]
     Init Android kernel compilation workspace.
 
     Options:
-      -h, --help             Show this help message and exit.
-      -r, --repo             Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
-      -b, --branch           Kernel manifest repo branch.
-      -f, --file             Kernel manifest file name.
-      -g, --gki-abi          Kernel GKI ABI (required if susfs enabled).
-      -n, --kernel-name      Custom Kernel name.
-      -c, --codename         CPU code name.
-      -k, --kernelsu         KernelSU variant (optional, accepted Official, KSUN, MKSU, RKSU, SKSU).
-      -B, --kernelsu-branch  KernelSU git repo branch (default main).
-      -v, --kernelsu-version Custom KernelSU version string (optional).
-      -s, --susfs            (bool) Enable susfs integration (default true)
-      -z, --bazel            (bool) Build with bazel (default false)
+      -h, --help                   Show this help message and exit.
+      -r, --repo                   Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
+      -b, --branch                 Kernel manifest repo branch.
+      -f, --file                   Kernel manifest file name.
+      -g, --gki-abi                Kernel GKI ABI (required if susfs enabled).
+      -n, --kernel-name            Custom Kernel name.
+      -c, --codename               CPU code name.
+      -k, --kernelsu               KernelSU variant (optional, accepted Official, KSUN, MKSU, RKSU, SKSU).
+      -B, --kernelsu-branch        KernelSU git repo branch (default main).
+      -v, --kernelsu-version       Custom KernelSU version string (optional).
+      -m, --kernelsu-manual-hooks  (bool) Implementation using manual hooks instead of kprobes (default false, supported KSUN, RKSU, SKSU with susfs).
+      -s, --susfs                  (bool) Enable susfs integration (default true)
+      -z, --bazel                  (bool) Build with bazel (default false)
 EOF
 }
 
@@ -176,8 +177,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:k:B:v:s::z \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,kernelsu:,kernelsu-branch:,kernelsu-version:,susfs::,bazel \
+    local args=`getopt -o hr:b:f:g:n:c:k:B:v:ms::z \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,kernelsu:,kernelsu-branch:,kernelsu-version:,kernelsu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
     eval set -- "$args"
@@ -229,6 +230,10 @@ parse_args() {
             -B|--kernelsu-branch)
                 KSU_BRANCH="$2"
                 shift 2
+                ;;
+            -m|--kernelsu-manual-hooks)
+                KSU_MANUAL_HOOKS=true
+                shift 1
                 ;;
             -s|--susfs)
                 case "$2" in
@@ -294,6 +299,10 @@ EOF
         if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
             echo "SUSFS_BRANCH=gki-$GKI_ABI" >> repo.conf
         fi
+
+        if [[ $KSU_MANUAL_HOOKS == true ]]; then
+            echo 'KSU_MANUAL_HOOKS=true' >> repo.conf
+        fi
     fi
 
     if [[ $BAZEL_BUILD == true ]]; then
@@ -303,6 +312,12 @@ EOF
 
 check_args() {
     local result=0
+
+    if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
+        local susfs_status=true
+    else
+        local susfs_status=false
+    fi
 
     if [[ ! $REPO_BRANCH ]]; then
         echo 'No repo branch specified.'
@@ -337,7 +352,7 @@ check_args() {
             result=1
         fi
 
-        if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
+        if [[ $susfs_status == true ]]; then
             if [[ ! $GKI_ABI ]]; then
                 echo 'No GKI ABI specified.'
                 result=1
@@ -351,23 +366,40 @@ check_args() {
         else
             if [[ $GKI_ABI ]]; then
                 echo 'GKI ABI specified, but susfs not enabled, ignored.'
+                unset GKI_ABI
+            fi
+        fi
+
+        if [[ $KSU_MANUAL_HOOKS ]]; then
+            if [[ $KSU != 'ksun' && $KSU != 'rksu' && $KSU != 'sksu' && ! ( $KSU == 'sksu' && $susfs_status == true ) ]]; then
+                echo "KernelSU manual hooks only supported for KSUN, RKSU, SKSU with susfs."
+                result=1
             fi
         fi
     else
         if [[ $KSU_VER ]]; then
             echo "Custom KernelSU version '$KSU_VER' specified, but KernelSU not enabled, ignored."
+            unset KSU_VER
         fi
 
         if [[ $KSU_BRANCH ]]; then
             echo "Custom KernelSU repo branch '$KSU_BRANCH' specified, but KernelSU not enabled, ignored."
+            unset KSU_BRANCH
         fi
 
         if [[ $SUSFS_ENABLED ]]; then
             echo "Susfs status manually specified, but KernelSU not enabled, ignored."
+            unset SUSFS_ENABLED
         fi
 
         if [[ $GKI_ABI ]]; then
             echo 'GKI ABI specified, but KernelSU not enabled, ignored.'
+            unset GKI_ABI
+        fi
+
+        if [[ $KSU_MANUAL_HOOKS ]]; then
+            echo "KernelSU manual hooks specified, but KernelSU not enabled, ignored."
+            unset KSU_MANUAL_HOOKS
         fi
     fi
 
