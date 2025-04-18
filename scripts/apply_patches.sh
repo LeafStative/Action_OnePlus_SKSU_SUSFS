@@ -26,15 +26,17 @@ apply_ksu_susfs_patches() {
     esac
 }
 
-apply_new_hooks_patches() {
+apply_manual_hooks_patches() {
     case "$KSU" in
         ksun)
             cp ../../kernel_patches4mksu/next/syscall_hooks.patch ./
             patch -p1 -F 3 < syscall_hooks.patch
             ;;
         sksu)
-            cp ../../kernel_patches4mksu/hooks/new_hooks.patch ./
-            patch -p1 -F 3 < new_hooks.patch
+            if [[ $SUSFS_ENABLED ]]; then
+                cp ../../patches/sksu_susfs_manual_hooks.patch ./
+                patch -p1 -F 3 < sksu_susfs_manual_hooks.patch
+            fi
             ;;
     esac
 }
@@ -126,7 +128,7 @@ apply_susfs_patches() {
     patch -p1 < 50_add_susfs_in_$SUSFS_BRANCH.patch || true
     patch -p1 -F 3 < 69_hide_stuff.patch
 
-    apply_new_hooks_patches
+    apply_manual_hooks_patches
     add_susfs_configs
     popd
 
