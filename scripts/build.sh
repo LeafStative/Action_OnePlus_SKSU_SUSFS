@@ -16,7 +16,7 @@ main() {
         # Hack to bypass asking for lto and the "build target" selection.
         # See kernel_platform/oplus/build/oplus_build_kernel.sh
         # and kernel_platform/oplus/build/oplus_setup.sh
-        ./kernel_platform/oplus/build/oplus_build_kernel.sh "$CPU_CODENAME gki" "$lto all"
+        echo -e "$lto\nall" | ./kernel_platform/oplus/build/oplus_build_kernel.sh $CPU_CODENAME gki
     fi
 }
 
