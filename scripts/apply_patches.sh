@@ -17,12 +17,10 @@ apply_ksu_susfs_patches() {
             cp ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./KernelSU
             cp ../kernel_patches4mksu/mksu/mksu_susfs.patch ./KernelSU
             cp ../kernel_patches4mksu/mksu/fix.patch ./KernelSU
-            cp ../kernel_patches4mksu/mksu/vfs_fix.patch ./KernelSU
             pushd ./KernelSU
             patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
             patch -p1 < mksu_susfs.patch || true
             patch -p1 < fix.patch || true
-            patch -p1 < vfs_fix.patch
             popd
             ;;
     esac
@@ -34,7 +32,7 @@ apply_new_hooks_patches() {
             cp ../../kernel_patches4mksu/next/syscall_hooks.patch ./
             patch -p1 -F 3 < syscall_hooks.patch
             ;;
-        mksu|sksu)
+        sksu)
             cp ../../kernel_patches4mksu/hooks/new_hooks.patch ./
             patch -p1 -F 3 < new_hooks.patch
             ;;
