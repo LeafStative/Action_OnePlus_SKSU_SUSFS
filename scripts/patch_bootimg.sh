@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-magiskboot=tools/magiskboot
+magiskboot=`realpath tools/magiskboot`
 
 main() {
     local stock_img=`realpath "$1"`
