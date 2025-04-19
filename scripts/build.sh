@@ -13,6 +13,15 @@ main() {
         # and kernel_platform/oplus/build/oplus_setup.sh
         echo -e "$lto\nall" | ./kernel_platform/oplus/build/oplus_build_kernel.sh $CPU_CODENAME gki
     fi
+
+    if [[ ! -f 'out/dist/Image' ]]; then
+        echo 'Build failed!'
+        exit 1
+    fi
+
+    local kernel_version=`strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+'`
+    echo "Kernel version: $kernel_version"
+    echo Build successful
 }
 
 main $1
