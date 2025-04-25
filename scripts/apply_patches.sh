@@ -124,6 +124,7 @@ configure_ksu_version() {
     fi
 
     sed -i "s/DKSU_VERSION=$default_version/DKSU_VERSION=$ksu_ver/" "$makefile"
+    echo "KernelSU version: $ksu_ver"
 
     popd
 }
