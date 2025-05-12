@@ -69,14 +69,6 @@ check_environment() {
         return $result
     fi
 
-    which python > /dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        python() {
-            python3 $@
-        }
-        export -f python
-    fi
-
     return 0
 }
 
