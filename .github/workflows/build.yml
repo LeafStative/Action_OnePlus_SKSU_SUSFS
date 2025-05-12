@@ -1,0 +1,172 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Manifest repo'
+        required: false
+      branch:
+        description: 'Manifest repo branch'
+        required: true
+        default: 'oneplus/sm8475'
+      file:
+        description: 'Manifest file name'
+        required: true
+        default: 'oneplus_ace2_v.xml'
+      gki_abi:
+        description: 'GKI ABI'
+        required: false
+        type: choice
+        options:
+          - android12-5.10
+          - android13-5.10
+          - android13-5.15
+          - android14-5.15
+          - android14-6.1
+          - android15-6.6
+      kernel_name:
+        description: 'Kernel name'
+        required: true
+        default: '-android12-9-o-g4beca10de372-hath'
+      codename:
+        description: 'CPU codename'
+        required: true
+        default: 'waipio'
+      kernelsu_variant:
+        description: "KernelSU variant"
+        required: false
+        type: choice
+        options:
+          - Official
+          - KSUN
+          - MKSU
+          - RKSU
+          - SKSU
+        default: MKSU
+      kernelsu_manual_hooks:
+        description: 'Use manual hooks to integrate KernelSU'
+        required: false
+        type: boolean
+      susfs_enabled:
+        description: 'Enable susfs'
+        required: true
+        type: boolean
+        default: true
+      build_with_bazel:
+        description: 'Build with bazel'
+        required: false
+        type: boolean
+        default: false
+
+permissions: 
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "LeafStative"
+          git config --global user.email "leafstative@gmail.com"
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y python3 git curl
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure init arguments
+        id: init_args
+        run: |
+          args=''
+          if [[ '${{ inputs.repo }}' ]]; then
+            args+=" -r '${{ inputs.repo }}'"
+          fi
+
+          if [[ '${{ inputs.kernelsu_variant }}' ]]; then
+            args+=" -k '${{ inputs.kernelsu_variant }}'"
+
+            if [[ '${{ inputs.susfs_enabled }}' == 'true' ]]; then
+              if [[ ! '${{ inputs.gki_abi }}' ]]; then
+                echo 'Error: GKI ABI is required when susfs is enabled.'
+                exit 1
+              fi
+
+              args+=" -g '${{ inputs.gki_abi }}'"
+            else
+              args+=" -s false"
+            fi
+
+            if [[ '${{ inputs.kernelsu_manual_hooks }}' == 'true' ]]; then
+              case '${{ inputs.kernelsu_variant }}-${{ inputs.susfs_enabled }}' in
+                KSUN-*|RKSU-*|SKSU-true)
+                  args+=" -m"
+                  ;;
+                *)
+                  echo 'Error: Manual hooks are only supported for KSUN, RKSU, and SKSU with susfs.'
+                  exit 1
+                  ;;
+              esac
+              args+=" -m"
+            fi
+          fi
+
+          if [[ '${{ inputs.build_with_bazel }}' == 'true' ]]; then
+            args+=" -z"
+          fi
+
+          echo "args=$args" >> $GITHUB_OUTPUT
+
+      - name: Init
+        run: |
+          ./scripts/init.sh \
+            -b '${{ inputs.branch }}' \
+            -f '${{ inputs.file }}' \
+            -n '${{ inputs.kernel_name }}' \
+            -c '${{ inputs.codename }}' ${{ steps.init_args.outputs.args }}
+
+      - name: Download source code
+        run: |
+          ./scripts/download_src.sh
+
+      - name: Apply patches
+        run: |
+          ./scripts/apply_patches.sh
+
+      - name: Build kernel
+        run: |
+          ./scripts/build.sh
+
+      - name: Make AnyKernel3
+        run: |
+          cd workspace
+          git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
+          rm -rf ./AnyKernel3/.git
+          cp out/dist/Image ./AnyKernel3
+
+      - name: Upload AnyKernel3
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'AnyKernel3_${{ inputs.kernelsu_variant }}${{ inputs.kernel_name }}.zip'
+          path: ./workspace/AnyKernel3/*
+
+      - name: Upload kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'kernel-${{ inputs.kernelsu_variant }}${{ inputs.kernel_name }}'
+          path: ./workspace/out/dist/Image
