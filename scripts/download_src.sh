@@ -28,7 +28,7 @@ init_kernelsu() {
         if [[ $SUSFS_ENABLED == true ]]; then
             case "$KSU" in
                 rksu)
-                    init_args='-s susfs-v1.5.5'
+                    init_args='-s susfs-v1.5.7'
                     ;;
                 sksu)
                     init_args='-s susfs-stable'
