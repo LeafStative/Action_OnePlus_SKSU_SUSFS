@@ -7,6 +7,12 @@ main() {
         exit 1
     fi
 
+    if [[ ! -d workspace ]]; then
+        echo 'No workspace found. Please run download_src.sh to download source code first.'
+        exit 1
+    fi
+    pushd workspace
+
     if [[ ! -f 'out/dist/Image' ]]; then
         echo 'Kernel image not found! Please build the kernel first.'
         exit 1
@@ -38,6 +44,8 @@ main() {
     popd
 
     rm -rf ./AnyKernel3
+
+    popd
 
     echo 'AnyKernel3 archive saved to ak3.zip'
 }

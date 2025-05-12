@@ -11,6 +11,12 @@ main() {
         export -f python
     fi
 
+    if [[ ! -d workspace ]]; then
+        echo 'No workspace found. Please run download_src.sh to download source code first.'
+        exit 1
+    fi
+    pushd workspace
+
     local lto=$( [[ $1 ]] && echo "$1" || echo 'thin' )
 
     if [[ $BAZEL_BUILD == 'true' ]]; then
@@ -28,6 +34,9 @@ main() {
     fi
 
     local kernel_version=`strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+'`
+
+    popd
+
     echo "Kernel version: $kernel_version"
     echo Build successful
 }

@@ -161,7 +161,14 @@ main() {
     SUSFS_ENABLED=true
     source repo.conf
 
+    if [[ ! -d workspace ]]; then
+        echo 'No workspace found. Please run download_src.sh to download source code first.'
+        exit 1
+    fi
+
     set -e
+    pushd workspace
+
     if [[ $KSU ]]; then
         if [[ $SUSFS_ENABLED == true ]]; then
             apply_susfs_patches
@@ -172,6 +179,8 @@ main() {
     fi
 
     configure_kernel_name
+
+    popd
     set +e
 }
 

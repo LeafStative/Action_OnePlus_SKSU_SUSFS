@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-repo=tools/repo
+repo=`realpath tools/repo`
 
 init_repo() {
     set -e
@@ -71,6 +71,10 @@ main() {
     REPO_URL='https://github.com/OnePlusOSS/kernel_manifest'
     SUSFS_ENABLED=true
     source repo.conf
+
+    mkdir -p workspace
+    pushd workspace
+
     init_repo
 
     if [[ $KSU ]]; then
@@ -80,6 +84,8 @@ main() {
             init_susfs
         fi
     fi
+
+    popd
 }
 
 main
