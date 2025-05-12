@@ -69,6 +69,7 @@ init_susfs() {
 
 main() {
     REPO_URL='https://github.com/OnePlusOSS/kernel_manifest'
+    KSU_BRANCH=main
     SUSFS_ENABLED=true
     source repo.conf
 
