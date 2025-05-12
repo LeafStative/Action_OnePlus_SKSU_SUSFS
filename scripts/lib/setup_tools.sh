@@ -44,11 +44,7 @@ download_repo() {
 }
 
 main() {
-    if [[ ! -d tools ]]; then
-        mkdir tools
-    fi
-
-    mkdir setup_workdir
+    mkdir -p tools setup_workdir
 
     local result=0
     if [[ ! -f tools/magiskboot ]]; then

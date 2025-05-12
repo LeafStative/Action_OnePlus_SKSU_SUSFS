@@ -14,7 +14,7 @@ main() {
         exit 1
     fi
 
-    mkdir magiskboot_workdir
+    mkdir -p magiskboot_workdir
     pushd magiskboot_workdir
 
     $magiskboot unpack "$stock_img"
