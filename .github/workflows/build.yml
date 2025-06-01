@@ -77,15 +77,15 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "LeafStative"
-          git config --global user.email "leafstative@gmail.com"
-
       - name: Install dependencies
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install -y python3 git curl
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "LeafStative"
+          git config --global user.email "leafstative@gmail.com"
 
       - name: Checkout
         uses: actions/checkout@v4
