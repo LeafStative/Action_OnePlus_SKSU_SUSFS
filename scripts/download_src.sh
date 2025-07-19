@@ -19,7 +19,22 @@ init_sukisu() {
 
     set -e
     pushd ./kernel_platform
+
     curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash $init_args
+
+    pushd ./KernelSU
+
+    local sukisu_ver
+    if [[ $SUKISU_VER ]]; then
+        sukisu_ver=$SUKISU_VER
+    else
+        sukisu_ver=$(( $(git rev-list --count main) + 10606 ))
+    fi
+
+    sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=$sukisu_ver/" kernel/Makefile
+    echo "SukiSU-Ultra version: $sukisu_ver"
+
+    popd
     popd
     set +e
 }

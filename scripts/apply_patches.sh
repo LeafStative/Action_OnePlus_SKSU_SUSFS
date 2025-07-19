@@ -52,24 +52,6 @@ add_sukisu_configs() {
     popd
 }
 
-configure_sukisu_version() {
-    local makefile='kernel/Makefile'
-
-    pushd ./kernel_platform/SukiSU-Ultra
-
-    local sukisu_ver
-    if [[ $SUKISU_VER ]]; then
-        sukisu_ver=$SUKISU_VER
-    else
-        sukisu_ver=$(( $(git rev-list --count main) + 10606 ))
-    fi
-
-    sed -i "s/DKSU_VERSION=12500/DKSU_VERSION=$sukisu_ver/" "$makefile"
-    echo "SukiSU-Ultra version: $sukisu_ver"
-
-    popd
-}
-
 configure_kernel_name() {
     pushd ./kernel_platform
     sed -i "\$s|echo \"\\\$res\"|echo \"\\${KERNEL_NAME}\"|" ./common/scripts/setlocalversion
@@ -116,7 +98,6 @@ main() {
         fi
 
         add_sukisu_configs
-        configure_sukisu_version
     fi
 
     configure_kernel_name
