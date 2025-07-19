@@ -5,9 +5,10 @@ apply_sukisu_susfs_patches() {
 }
 
 apply_manual_hooks_patches() {
-    if [[ $SUSFS_ENABLED == true ]]; then
-        cp ../../patches/sksu_susfs_manual_hooks.patch ./
-        patch -p1 -F 3 < sksu_susfs_manual_hooks.patch
+    if [[ $SUSFS_ENABLED == true && $SUKISU_MANUAL_HOOKS == true ]]; then
+        echo 'Patching manual hooks'
+        cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
+        patch -p1 -F 3 < syscall_hooks.patch.patch
     fi
 }
 
@@ -16,18 +17,22 @@ add_sukisu_configs() {
 
     local config_file='./arch/arm64/configs/gki_defconfig'
 
+    echo "CONFIG_KSU=y" >> $config_file
+
+    # TODO: implement kpm switch
+    if [[ $KSU == 'sksu' ]]; then
+        echo 'CONFIG_KPM=y' >> $config_file
+    fi
+
     if [[ $SUKISU_MANUAL_HOOKS == true && $SUSFS_ENABLED == true ]]; then
         echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
     else
         echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
     fi
 
-    # TODO
-    if [[ $KSU == 'sksu' ]]; then
-        echo 'CONFIG_KPM=y' >> $config_file
+    if [[ $SUKISU_MANUAL_HOOKS != true ]]; then
+        echo 'CONFIG_KPROBES=y' >> $config_file
     fi
-
-    echo "CONFIG_KSU=y" >> $config_file
 
     if [[ $SUSFS_ENABLED == true ]]; then
         echo "CONFIG_KSU_SUSFS=y" >> $config_file
@@ -45,10 +50,17 @@ add_sukisu_configs() {
         echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> $config_file
         echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> $config_file
         echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> $config_file
-        echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> $config_file
+
+        if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
+            echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> $config_file
+        else
+            echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> $config_file
+        fi
     fi
 
     sed -i 's/check_defconfig//' ./build.config.gki
+
+    # TODO: LZ4KD
     popd
 }
 
@@ -62,16 +74,21 @@ configure_kernel_name() {
 
 apply_susfs_patches() {
     pushd ./kernel_platform
-    cp ../susfs4ksu/kernel_patches/50_add_susfs_in_$SUSFS_BRANCH.patch ./common/
-    cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
-    cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
+    cp ../susfs4ksu/kernel_patches/50_add_susfs_in_$SUSFS_BRANCH.patch ./common
+    cp ../susfs4ksu/kernel_patches/fs/* ./common/fs
+    cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux
+
+    # TODO: ZRAM
 
     apply_sukisu_susfs_patches
 
-    cp ../kernel_patches4mksu/69_hide_stuff.patch ./common
+    cp ../SukiSU_patch/69_hide_stuff.patch ./common
 
     pushd ./common
+    echo 'Patching SUSFS'
     patch -p1 < 50_add_susfs_in_$SUSFS_BRANCH.patch || true
+    
+    echo 'Patching 69_hide_stuff.patch'
     patch -p1 -F 3 < 69_hide_stuff.patch
 
     apply_manual_hooks_patches

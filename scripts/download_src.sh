@@ -7,10 +7,22 @@ init_repo() {
     $repo init -u "$REPO_URL" -b "$REPO_BRANCH" -m "$MANIFEST_FILE" --depth=1
     $repo --trace sync -c -j$(nproc) --no-tags --fail-fast
 
+    if [ -e 'kernel_platform/common/BUILD.bazel' ]; then
+        sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' \
+        kernel_platform/common/BUILD.bazel
+    fi
+
+    if [[ -e 'kernel_platform/msm-kernel/BUILD.bazel' ]]; then
+        sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' \
+        kernel_platform/msm-kernel/BUILD.bazel
+    fi
+
     rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
     rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
+
     sed -i 's/ -dirty//g' kernel_platform/common/scripts/setlocalversion
     sed -i 's/ -dirty//g' kernel_platform/msm-kernel/scripts/setlocalversion
+    sed -i 's/ -dirty//g' kernel_platform/external/dtc/scripts/setlocalversion
     set +e
 }
 
@@ -42,7 +54,7 @@ init_sukisu() {
 init_susfs() {
     set -e
     git clone https://gitlab.com/simonpunk/susfs4ksu.git -b $SUSFS_BRANCH
-    git clone https://github.com/TanakaLun/kernel_patches4mksu.git
+    git clone https://github.com/ShirkNeko/SukiSU_patch
     set +e
 }
 
