@@ -13,10 +13,9 @@ USAGE: $0 [OPTION ...]
       -g, --gki-abi                Kernel GKI ABI (required if susfs enabled).
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
-      -k, --kernelsu               KernelSU variant (optional, accepted Official, KSUN, MKSU, RKSU, SKSU).
-      -B, --kernelsu-branch        KernelSU git repo branch (default main).
-      -v, --kernelsu-version       Custom KernelSU version string (optional).
-      -m, --kernelsu-manual-hooks  (bool) Implementation using manual hooks instead of kprobes (default false, supported KSUN, RKSU, SKSU with susfs).
+      -k, --sukisu                 Integrate SukiSU-Ultra to kernel
+      -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
+      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, supported KSUN, RKSU, SKSU with susfs).
       -s, --susfs                  (bool) Enable susfs integration (default true)
       -z, --bazel                  (bool) Build with bazel (default false)
 EOF
@@ -72,29 +71,6 @@ check_environment() {
     return 0
 }
 
-check_ksu_variant() {
-    local ksu=${1,,}
-    case "$ksu" in
-        official|ksun|mksu|rksu|sksu)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
-check_ksu_branch() {
-    case "$1" in
-        tag|main)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
 check_gki_abi() {
     case "$1" in
         android12-5.10|android13-5.10|android13-5.15|android14-5.15|android14-6.1|android15-6.6)
@@ -107,8 +83,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:k:B:v:ms::z \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,kernelsu:,kernelsu-branch:,kernelsu-version:,kernelsu-manual-hooks,susfs::,bazel \
+    local args=`getopt -o hr:b:f:g:n:c:k:v:ms::z \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
     eval set -- "$args"
@@ -149,20 +125,16 @@ parse_args() {
                 CPU_CODENAME="$2"
                 shift 2
                 ;;
-            -k|--kernelsu)
-                KSU="$2"
+            -k|--sukisu)
+                SUKISU=true
+                shift 1
+                ;;
+            -v|--sukisu-version)
+                SUKISU_VER="$2"
                 shift 2
                 ;;
-            -v|--kernelsu-version)
-                KSU_VER="$2"
-                shift 2
-                ;;
-            -B|--kernelsu-branch)
-                KSU_BRANCH="$2"
-                shift 2
-                ;;
-            -m|--kernelsu-manual-hooks)
-                KSU_MANUAL_HOOKS=true
+            -m|--sukisu-manual-hooks)
+                SUKISU_MANUAL_HOOKS=true
                 shift 1
                 ;;
             -s|--susfs)
@@ -211,15 +183,11 @@ KERNEL_NAME='$KERNEL_NAME'
 CPU_CODENAME=$CPU_CODENAME
 EOF
 
-    if [[ $KSU ]]; then
-        echo -e "\nKSU=${KSU,,}" >> repo.conf
+    if [[ $SUKISU == true ]]; then
+        echo -e '\nSUKISU=true' >> repo.conf
 
-        if [[ $KSU_VER ]]; then
-            echo "KSU_VER=$KSU_VER" >> repo.conf
-        fi
-
-        if [[ $KSU_BRANCH ]]; then
-            echo "KSU_BRANCH=$KSU_BRANCH" >> repo.conf
+        if [[ $SUKISU_VER ]]; then
+            echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         fi
 
         if [[ $SUSFS_ENABLED ]]; then
@@ -230,8 +198,8 @@ EOF
             echo "SUSFS_BRANCH=gki-$GKI_ABI" >> repo.conf
         fi
 
-        if [[ $KSU_MANUAL_HOOKS == true ]]; then
-            echo 'KSU_MANUAL_HOOKS=true' >> repo.conf
+        if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
+            echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
         fi
     fi
 
@@ -269,19 +237,7 @@ check_args() {
         result=1
     fi
 
-    if [[ $KSU ]]; then
-        check_ksu_variant "$KSU"
-        if [[ $? -ne 0 ]]; then
-            echo "Invalid KernelSU variant '$KSU'."
-            result=1
-        fi
-
-        check_ksu_branch "$KSU_BRANCH"
-        if [[ $KSU_BRANCH && $? -ne 0 ]]; then
-            echo "Invalid KernelSU branch '$KSU_BRANCH'."
-            result=1
-        fi
-
+    if [[ $SUKISU == true ]]; then
         if [[ $susfs_status == true ]]; then
             if [[ ! $GKI_ABI ]]; then
                 echo 'No GKI ABI specified.'
@@ -300,36 +256,29 @@ check_args() {
             fi
         fi
 
-        if [[ $KSU_MANUAL_HOOKS ]]; then
-            if [[ $KSU != 'ksun' && $KSU != 'rksu' && $KSU != 'sksu' && ! ( $KSU == 'sksu' && $susfs_status == true ) ]]; then
-                echo "KernelSU manual hooks only supported for KSUN, RKSU, SKSU with susfs."
-                result=1
-            fi
+        if [[ $SUKISU_MANUAL_HOOKS == true && $susfs_status != true ]]; then
+            echo 'SUSFS is required by SukiSU-Ultra manual hooks, but it is not enabled.'
+            result=1
         fi
     else
-        if [[ $KSU_VER ]]; then
-            echo "Custom KernelSU version '$KSU_VER' specified, but KernelSU not enabled, ignored."
-            unset KSU_VER
-        fi
-
-        if [[ $KSU_BRANCH ]]; then
-            echo "Custom KernelSU repo branch '$KSU_BRANCH' specified, but KernelSU not enabled, ignored."
-            unset KSU_BRANCH
+        if [[ $SUKISU_VER ]]; then
+            echo "Custom SukiSU-Ultra version '$SUKISU_VER' specified, but SukiSU-Ultra not enabled, ignored."
+            unset SUKISU_VER
         fi
 
         if [[ $SUSFS_ENABLED ]]; then
-            echo "Susfs status manually specified, but KernelSU not enabled, ignored."
+            echo "Susfs status manually specified, but SukiSU-Ultra not enabled, ignored."
             unset SUSFS_ENABLED
         fi
 
         if [[ $GKI_ABI ]]; then
-            echo 'GKI ABI specified, but KernelSU not enabled, ignored.'
+            echo 'GKI ABI specified, but SukiSU-Ultra not enabled, ignored.'
             unset GKI_ABI
         fi
 
-        if [[ $KSU_MANUAL_HOOKS ]]; then
-            echo "KernelSU manual hooks specified, but KernelSU not enabled, ignored."
-            unset KSU_MANUAL_HOOKS
+        if [[ $SUKISU_MANUAL_HOOKS ]]; then
+            echo "SukiSU-Ultra manual hooks specified, but SukiSU-Ultra not enabled, ignored."
+            unset SUKISU_MANUAL_HOOKS
         fi
     fi
 

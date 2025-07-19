@@ -1,71 +1,28 @@
 #!/usr/bin/bash
 
-apply_ksu_susfs_patches() {
-    case "$KSU" in
-        official)
-            cp ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./KernelSU
-            pushd ./KernelSU
-            patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
-            popd
-            ;;
-        ksun)
-            cp ../kernel_patches4mksu/next/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./KernelSU-Next
-            pushd ./KernelSU-Next
-            patch -p1 --forward < 0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch || true
-            ;;
-        mksu)
-            cp ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./KernelSU
-            cp ../kernel_patches4mksu/mksu/mksu_susfs.patch ./KernelSU
-            cp ../kernel_patches4mksu/mksu/fix.patch ./KernelSU
-            pushd ./KernelSU
-            patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
-            patch -p1 < mksu_susfs.patch || true
-            patch -p1 < fix.patch || true
-            popd
-            ;;
-    esac
+apply_sukisu_susfs_patches() {
+    # TODO
 }
 
 apply_manual_hooks_patches() {
-    case "$KSU" in
-        ksun)
-            cp ../../kernel_patches4mksu/next/syscall_hooks.patch ./
-            patch -p1 -F 3 < syscall_hooks.patch
-            ;;
-        rksu)
-            cp ../../patches/rksu_manual_hooks.patch ./
-            patch -p1 -F 3 < rksu_manual_hooks.patch
-            ;;
-        sksu)
-            if [[ $SUSFS_ENABLED ]]; then
-                cp ../../patches/sksu_susfs_manual_hooks.patch ./
-                patch -p1 -F 3 < sksu_susfs_manual_hooks.patch
-            fi
-            ;;
-    esac
+    if [[ $SUSFS_ENABLED == true ]]; then
+        cp ../../patches/sksu_susfs_manual_hooks.patch ./
+        patch -p1 -F 3 < sksu_susfs_manual_hooks.patch
+    fi
 }
 
-add_ksu_configs() {
+add_sukisu_configs() {
     pushd ./kernel_platform/common
 
     local config_file='./arch/arm64/configs/gki_defconfig'
-    local hook_mode=$( [[ $KSU_MANUAL_HOOKS == true ]] && echo 'manual' || echo 'kprobes' )
 
-    case "$KSU-$hook_mode-$SUSFS_ENABLED" in
-        ksun-manual-*)
-            echo 'CONFIG_KSU_WITH_KPROBES=n' >> $config_file
-            ;;
-        ksun-kprobes-*)
-            echo 'CONFIG_KSU_WITH_KPROBES=y' >> $config_file
-            ;;
-        rksu-manual-*|sksu-manual-true)
-            echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
-            ;;
-        rksu-kprobes-*|sksu-kprobes-true)
-            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
-            ;;
-    esac
+    if [[ $SUKISU_MANUAL_HOOKS == true && $SUSFS_ENABLED == true ]]; then
+        echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
+    else
+        echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+    fi
 
+    # TODO
     if [[ $KSU == 'sksu' ]]; then
         echo 'CONFIG_KPM=y' >> $config_file
     fi
@@ -95,36 +52,20 @@ add_ksu_configs() {
     popd
 }
 
-configure_ksu_version() {
+configure_sukisu_version() {
     local makefile='kernel/Makefile'
 
-    local default_version
-    case "$KSU" in
-        ksun)
-            pushd ./kernel_platform/KernelSU-Next
-            default_version=11998
-            ;;
-        sksu)
-            pushd ./kernel_platform/SukiSU-Ultra
-            default_version=12500
-            ;;
-        *)
-            pushd ./kernel_platform/KernelSU
-            default_version=16
-            ;;
-    esac
+    pushd ./kernel_platform/SukiSU-Ultra
 
-    local ksu_ver
-    if [[ $KSU_VER ]]; then
-        ksu_ver=$KSU_VER
-    elif [[ $KSU == 'sksu' ]]; then
-        ksu_ver=$(( $(git rev-list --count main) + 10606 ))
+    local sukisu_ver
+    if [[ $SUKISU_VER ]]; then
+        sukisu_ver=$SUKISU_VER
     else
-        ksu_ver=$(( $(git rev-list --count HEAD) + 10200 ))
+        sukisu_ver=$(( $(git rev-list --count main) + 10606 ))
     fi
 
-    sed -i "s/DKSU_VERSION=$default_version/DKSU_VERSION=$ksu_ver/" "$makefile"
-    echo "KernelSU version: $ksu_ver"
+    sed -i "s/DKSU_VERSION=12500/DKSU_VERSION=$sukisu_ver/" "$makefile"
+    echo "SukiSU-Ultra version: $sukisu_ver"
 
     popd
 }
@@ -143,7 +84,7 @@ apply_susfs_patches() {
     cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
     cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
 
-    apply_ksu_susfs_patches
+    apply_sukisu_susfs_patches
 
     cp ../kernel_patches4mksu/69_hide_stuff.patch ./common
 
@@ -169,13 +110,13 @@ main() {
     set -e
     pushd workspace
 
-    if [[ $KSU ]]; then
+    if [[ $SUKISU == true ]]; then
         if [[ $SUSFS_ENABLED == true ]]; then
             apply_susfs_patches
         fi
 
-        add_ksu_configs
-        configure_ksu_version
+        add_sukisu_configs
+        configure_sukisu_version
     fi
 
     configure_kernel_name
