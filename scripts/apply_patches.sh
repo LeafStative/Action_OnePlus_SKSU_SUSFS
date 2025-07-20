@@ -1,9 +1,5 @@
 #!/usr/bin/bash
 
-apply_sukisu_susfs_patches() {
-    # TODO
-}
-
 apply_manual_hooks_patches() {
     if [[ $SUSFS_ENABLED == true && $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'Patching manual hooks'
@@ -78,8 +74,6 @@ apply_susfs_patches() {
     cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux
 
     # TODO: ZRAM
-
-    apply_sukisu_susfs_patches
 
     cp ../SukiSU_patch/69_hide_stuff.patch ./common
 
