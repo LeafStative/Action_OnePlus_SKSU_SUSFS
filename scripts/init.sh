@@ -18,7 +18,7 @@ USAGE: $0 [OPTION ...]
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
       -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
       -s, --susfs                  (bool) Enable susfs integration (default true)
-      -z, --bazel                  (bool) Build with bazel (default false)
+      -B, --bazel                  (bool) Build with bazel (default false)
 EOF
 }
 
@@ -84,7 +84,7 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:kK::v:ms::z \
+    local args=`getopt -o hr:b:f:g:n:c:kK::v:ms::B \
     -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
@@ -170,7 +170,7 @@ parse_args() {
                         ;;
                 esac
                 ;;
-            -z|--bazel)
+            -B|--bazel)
                 BAZEL_BUILD=true
                 shift 1
                 ;;
