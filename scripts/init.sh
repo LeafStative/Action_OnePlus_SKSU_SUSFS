@@ -24,49 +24,34 @@ EOF
 }
 
 check_environment() {
-    which python3 > /dev/null 2>&1
-    local python3_exists=$?
-
-    which git > /dev/null 2>&1
-    local git_exists=$?
-
-    which curl > /dev/null 2>&1
-    local curl_exists=$?
-
-    which unzip > /dev/null 2>&1
-    local unzip_exists=$?
-
-    which jq > /dev/null 2>&1
-    local jq_exists=$?
-
     local result=0
-    if [[ $python3_exists -ne 0 ]]; then
-        echo "Python3 is not installed."
+    if ! which python3 > /dev/null 2>&1; then
+        echo 'Python3 is not installed.'
         result=1
     fi
 
-    if [[ $git_exists -ne 0 ]]; then
-        echo "Git is not installed."
+    if ! which git > /dev/null 2>&1; then
+        echo 'Git is not installed.'
         result=1
     fi
 
-    if [[ $curl_exists -ne 0 ]]; then
-        echo "Curl is not installed."
+    if ! which curl > /dev/null 2>&1; then
+        echo 'Curl is not installed.'
         result=1
     fi
 
-    if [[ $unzip_exists -ne 0 ]]; then
-        echo "Unzip is not installed."
+    if ! which unzip > /dev/null 2>&1; then
+        echo 'Unzip is not installed.'
         result=1
     fi
 
-    if [[ $jq_exists -ne 0 ]]; then
-        echo "Jq is not installed."
+    if ! which jq > /dev/null 2>&1; then
+        echo 'Jq is not installed.'
         result=1
     fi
 
     if [[ $result -ne 0 ]]; then
-        echo "Please install the missing dependencies."
+        echo 'Please install the missing dependencies.'
         return $result
     fi
 
@@ -89,9 +74,7 @@ parse_args() {
     -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
-    eval set -- "$args"
-    
-    if [[ $? -ne 0 ]]; then
+    if ! eval set -- "$args"; then
         help_message
         exit 1
     fi
@@ -319,13 +302,12 @@ check_args() {
 
 main() {
     parse_args $@
-    check_args
-    if [[ $? -ne 0 ]]; then
+
+    if ! check_args; then
         exit 1
     fi
 
-    check_environment
-    if [[ $? -ne 0 ]]; then
+    if ! check_environment; then
         exit 1
     fi
 
@@ -334,8 +316,7 @@ main() {
     if [[ ! -f 'tools/repo' || ! -f 'tools/magiskboot' ]]; then
         echo "Tools not found, downloading..."
         
-        "$script_dir/lib/setup_tools.sh"
-        if [[ $? -ne 0 ]]; then
+        if ! "$script_dir/lib/setup_tools.sh"; then
             echo "Failed to setup tools."
             result=1
         fi

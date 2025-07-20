@@ -15,14 +15,12 @@ download_magiskboot() {
         return 1
     fi
 
-    curl -Lo "$workdir/magisk.apk" $apk_url
-    if [[ $? -ne 0 ]]; then
+    if ! curl -Lo "$workdir/magisk.apk" $apk_url; then
         echo "Failed to download Magisk APK."
         return 1
     fi
 
-    unzip -jo "$workdir/magisk.apk" 'lib/x86_64/libmagiskboot.so' -d "$workdir"
-    if [[ $? -ne 0 ]]; then
+    if ! unzip -jo "$workdir/magisk.apk" 'lib/x86_64/libmagiskboot.so' -d "$workdir"; then
         echo "Failed to extract libmagiskboot.so from Magisk APK."
         return 1
     fi
@@ -33,8 +31,7 @@ download_magiskboot() {
 
 download_repo() {
     local workdir=$1
-    curl -Lo "$workdir/repo" https://storage.googleapis.com/git-repo-downloads/repo
-    if [[ $? -ne 0 ]]; then
+    if ! curl -Lo "$workdir/repo" https://storage.googleapis.com/git-repo-downloads/repo; then
         echo "Failed to download repo tool."
         return 1
     fi
