@@ -19,8 +19,7 @@ add_sukisu_configs() {
 
     echo "CONFIG_KSU=y" >> $config_file
 
-    # TODO: implement kpm switch
-    if [[ $KSU == 'sksu' ]]; then
+    if [[ $SUKISU_KPM == true ]]; then
         echo 'CONFIG_KPM=y' >> $config_file
     fi
 
@@ -99,6 +98,7 @@ apply_susfs_patches() {
 
 main() {
     SUSFS_ENABLED=true
+    SUKISU_KPM=true
     source repo.conf
 
     if [[ ! -d workspace ]]; then

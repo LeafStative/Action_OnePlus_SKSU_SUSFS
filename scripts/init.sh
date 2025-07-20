@@ -14,6 +14,7 @@ USAGE: $0 [OPTION ...]
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false)
+      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true)
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
       -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
       -s, --susfs                  (bool) Enable susfs integration (default true)
@@ -83,8 +84,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
-    local args=`getopt -o hr:b:f:g:n:c:kv:ms::z \
+    local args=`getopt -o hr:b:f:g:n:c:kK::v:ms::z \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
     eval set -- "$args"
@@ -128,6 +129,22 @@ parse_args() {
             -k|--sukisu)
                 SUKISU=true
                 shift 1
+                ;;
+            -K|--sukisu-kpm)
+                case "$2" in
+                    ''|true)
+                        SUKISU_KPM=true
+                        shift 2
+                        ;;
+                    false)
+                        SUKISU_KPM=false
+                        shift 2
+                        ;;
+                    *)
+                        echo "Invalid susfs status '$2'."
+                        exit 1
+                        ;;
+                esac
                 ;;
             -v|--sukisu-version)
                 SUKISU_VER="$2"
@@ -185,6 +202,10 @@ EOF
 
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
+
+        if [[ $SUKISU_KPM ]]; then
+            echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        fi
 
         if [[ $SUKISU_VER ]]; then
             echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
@@ -261,13 +282,18 @@ check_args() {
             result=1
         fi
     else
+        if [[ $SUKISU_KPM ]]; then
+            echo "KernelPatch module support enabled, but SukiSU-Ultra not enabled, ignored."
+            unset SUKISU_VER
+        fi
+
         if [[ $SUKISU_VER ]]; then
             echo "Custom SukiSU-Ultra version '$SUKISU_VER' specified, but SukiSU-Ultra not enabled, ignored."
             unset SUKISU_VER
         fi
 
         if [[ $SUSFS_ENABLED ]]; then
-            echo "Susfs status manually specified, but SukiSU-Ultra not enabled, ignored."
+            echo "SUSFS status manually specified, but SukiSU-Ultra not enabled, ignored."
             unset SUSFS_ENABLED
         fi
 
