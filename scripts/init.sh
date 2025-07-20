@@ -83,8 +83,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:k:v:ms::z \
     -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
+    local args=`getopt -o hr:b:f:g:n:c:kv:ms::z \
     -n "$0" -- "$@"`
 
     eval set -- "$args"
