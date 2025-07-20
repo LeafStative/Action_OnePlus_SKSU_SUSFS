@@ -10,9 +10,10 @@ USAGE: $0 [OPTION ...]
       -r, --repo                   Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
       -b, --branch                 Kernel manifest repo branch.
       -f, --file                   Kernel manifest file name.
-      -g, --gki-abi                Kernel GKI ABI (required if susfs enabled).
+      -g, --gki-abi                Kernel GKI ABI (required if susfs or zram enabled).
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
+      -z, --zram                   (bool) Integrate ZRAM patches (default false)
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false)
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true)
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
@@ -84,8 +85,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:kK::v:ms::B \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
+    local args=`getopt -o hr:b:f:g:n:c:zkK::v:ms::B \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
     -n "$0" -- "$@"`
 
     eval set -- "$args"
@@ -125,6 +126,10 @@ parse_args() {
             -c|--codename)
                 CPU_CODENAME="$2"
                 shift 2
+                ;;
+            -z|--zram)
+                ZRAM_ENABLED=true
+                shift 1
                 ;;
             -k|--sukisu)
                 SUKISU=true
@@ -200,6 +205,14 @@ KERNEL_NAME='$KERNEL_NAME'
 CPU_CODENAME=$CPU_CODENAME
 EOF
 
+    if [[ $GKI_ABI ]]; then
+        echo "GKI_ABI=$GKI_ABI" >> repo.conf
+    fi
+
+    if [[ $ZRAM_ENABLED == true ]]; then
+        echo 'ZRAM_ENABLED=true' >> repo.conf
+    fi
+
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
@@ -213,10 +226,6 @@ EOF
 
         if [[ $SUSFS_ENABLED ]]; then
             echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
-        fi
-
-        if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
-            echo "SUSFS_BRANCH=gki-$GKI_ABI" >> repo.conf
         fi
 
         if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
@@ -258,25 +267,23 @@ check_args() {
         result=1
     fi
 
-    if [[ $SUKISU == true ]]; then
-        if [[ $susfs_status == true ]]; then
-            if [[ ! $GKI_ABI ]]; then
-                echo 'No GKI ABI specified.'
+    local gki_required=$( [[ $ZRAM_ENABLED || ( $SUKISU == true && $susfs_status == true ) ]] && echo true || echo false )
+    if [[ $GKI_ABI ]]; then
+        if [[ $gki_required == true ]]; then
+            if ! check_gki_abi "$GKI_ABI"; then
+                echo "Invalid GKI ABI '$GKI_ABI'."
                 result=1
-            else
-                check_gki_abi "$GKI_ABI"
-                if [[ $? -ne 0 ]]; then
-                    echo "Invalid GKI ABI '$GKI_ABI'."
-                    result=1
-                fi
             fi
         else
-            if [[ $GKI_ABI ]]; then
-                echo 'GKI ABI specified, but susfs not enabled, ignored.'
-                unset GKI_ABI
-            fi
+            echo 'GKI ABI specified, but ZRAM or SukiSU-Ultra with SUSFS not enabled, ignored.'
+            unset GKI_ABI
         fi
+    elif [[ $gki_required == true ]]; then
+        echo 'ZRAM or SukiSU-Ultra with SUSFS enabled, but no GKI ABI specified.'
+        result=1
+    fi
 
+    if [[ $SUKISU == true ]]; then
         if [[ $SUKISU_MANUAL_HOOKS == true && $susfs_status != true ]]; then
             echo 'SUSFS is required by SukiSU-Ultra manual hooks, but it is not enabled.'
             result=1
@@ -295,11 +302,6 @@ check_args() {
         if [[ $SUSFS_ENABLED ]]; then
             echo "SUSFS status manually specified, but SukiSU-Ultra not enabled, ignored."
             unset SUSFS_ENABLED
-        fi
-
-        if [[ $GKI_ABI ]]; then
-            echo 'GKI ABI specified, but SukiSU-Ultra not enabled, ignored.'
-            unset GKI_ABI
         fi
 
         if [[ $SUKISU_MANUAL_HOOKS ]]; then
