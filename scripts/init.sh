@@ -13,9 +13,9 @@ USAGE: $0 [OPTION ...]
       -g, --gki-abi                Kernel GKI ABI (required if susfs enabled).
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
-      -k, --sukisu                 Integrate SukiSU-Ultra to kernel
+      -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false)
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
-      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, supported KSUN, RKSU, SKSU with susfs).
+      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
       -s, --susfs                  (bool) Enable susfs integration (default true)
       -z, --bazel                  (bool) Build with bazel (default false)
 EOF
