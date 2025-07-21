@@ -21,7 +21,7 @@ apply_manual_hooks_patches() {
     if [[ $SUSFS_ENABLED == true && $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'Patching manual hooks'
         cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
-        patch -p1 -F 3 < syscall_hooks.patch.patch
+        patch -p1 -F 3 < syscall_hooks.patch
     fi
 }
 
