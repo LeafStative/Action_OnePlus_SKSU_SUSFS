@@ -31,6 +31,11 @@ main() {
         local overwrite=true
     fi
 
+    if [[ -e './AnyKernel3' ]]; then
+        echo 'AnyKernel3 exists, deleting'
+        rm -rf ./AnyKernel3
+    fi
+
     git clone https://github.com/Numbersf/AnyKernel3 --depth=1
     rm -rf ./AnyKernel3/.git
     cp out/dist/Image ./AnyKernel3/
@@ -42,8 +47,6 @@ main() {
     pushd AnyKernel3
     zip -rv ../AnyKernel3.zip *
     popd
-
-    rm -rf ./AnyKernel3
 
     popd
 
