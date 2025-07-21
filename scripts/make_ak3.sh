@@ -31,7 +31,7 @@ main() {
         local overwrite=true
     fi
 
-    git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
+    git clone https://github.com/Numbersf/AnyKernel3 --depth=1
     rm -rf ./AnyKernel3/.git
     cp out/dist/Image ./AnyKernel3/
 
