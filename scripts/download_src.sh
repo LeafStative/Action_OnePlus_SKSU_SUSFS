@@ -26,6 +26,13 @@ init_repo() {
     set +e
 }
 
+init_sched() {
+    set -e
+    git clone https://github.com/HanKuCha/sched_ext --depth=1
+    rm -rf ./sched_ext/.git
+    set +e
+}
+
 init_sukisu() {
     local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-' )
 
@@ -67,6 +74,10 @@ main() {
     pushd workspace
 
     init_repo
+
+    if [[ $SCHED_ENABLED == true ]]; then
+        init_sched
+    fi
 
     if [[ $SUKISU == true ]]; then
         init_sukisu

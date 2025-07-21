@@ -133,6 +133,10 @@ add_sukisu_configs() {
     popd
 }
 
+add_sched() {
+    cp -r ./sched_ext/* ./kernel_platform/common/kernel/sched
+}
+
 configure_kernel_name() {
     pushd ./kernel_platform
     sed -i "\$s|echo \"\\\$res\"|echo \"\\${KERNEL_NAME}\"|" ./common/scripts/setlocalversion
@@ -186,6 +190,10 @@ main() {
         fi
 
         add_sukisu_configs
+    fi
+
+    if [[ $SCHED_ENABLED == true ]]; then
+        add_sched
     fi
 
     configure_kernel_name

@@ -13,12 +13,13 @@ USAGE: $0 [OPTION ...]
       -g, --gki-abi                Kernel GKI ABI (required if susfs or zram enabled).
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
-      -z, --zram                   (bool) Integrate ZRAM patches (default false)
-      -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false)
-      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true)
+      -z, --zram                   (bool) Integrate ZRAM patches (default false).
+      -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
+      -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
+      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
       -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
-      -s, --susfs                  (bool) Enable susfs integration (default true)
+      -s, --susfs                  (bool) Enable susfs integration (default true).
 EOF
 }
 
@@ -69,8 +70,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:zkK::v:ms:: \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
+    local args=`getopt -o hr:b:f:g:n:c:zSkK::v:ms:: \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
     -n "$0" -- "$@"`
 
     if ! eval set -- "$args"; then
@@ -111,6 +112,10 @@ parse_args() {
                 ;;
             -z|--zram)
                 ZRAM_ENABLED=true
+                shift 1
+                ;;
+            -S|--sched)
+                SCHED_ENABLED=true
                 shift 1
                 ;;
             -k|--sukisu)
@@ -189,6 +194,10 @@ EOF
 
     if [[ $ZRAM_ENABLED == true ]]; then
         echo 'ZRAM_ENABLED=true' >> repo.conf
+    fi
+
+    if [[ $SCHED_ENABLED == true ]]; then
+        echo 'SCHED_ENABLED=true' >> repo.conf
     fi
 
     if [[ $SUKISU == true ]]; then
