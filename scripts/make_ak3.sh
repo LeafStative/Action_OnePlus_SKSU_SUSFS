@@ -18,8 +18,8 @@ main() {
         exit 1
     fi
 
-    if [[ -f 'ak3.zip' ]]; then
-        echo -n 'ak3.zip already exists. Do you want to overwrite it? (y/N): '
+    if [[ -f 'AnyKernel3.zip' ]]; then
+        echo -n 'AnyKernel3.zip already exists. Do you want to overwrite it? (y/N): '
 
         local answer
         read -r answer
@@ -36,18 +36,18 @@ main() {
     cp out/dist/Image ./AnyKernel3/
 
     if [[ $overwrite == true ]]; then
-        rm ak3.zip
+        rm AnyKernel3.zip
     fi
 
     pushd AnyKernel3
-    zip -rv ../ak3.zip *
+    zip -rv ../AnyKernel3.zip *
     popd
 
     rm -rf ./AnyKernel3
 
     popd
 
-    echo 'AnyKernel3 archive saved to ak3.zip'
+    echo 'AnyKernel3 archive saved to AnyKernel3.zip'
 }
 
 main
