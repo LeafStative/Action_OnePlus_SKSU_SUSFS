@@ -19,7 +19,6 @@ USAGE: $0 [OPTION ...]
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
       -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
       -s, --susfs                  (bool) Enable susfs integration (default true)
-      -B, --bazel                  (bool) Build with bazel (default false)
 EOF
 }
 
@@ -70,8 +69,8 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:zkK::v:ms::B \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs::,bazel \
+    local args=`getopt -o hr:b:f:g:n:c:zkK::v:ms:: \
+    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
     -n "$0" -- "$@"`
 
     if ! eval set -- "$args"; then
@@ -158,10 +157,6 @@ parse_args() {
                         ;;
                 esac
                 ;;
-            -B|--bazel)
-                BAZEL_BUILD=true
-                shift 1
-                ;;
 
             --)
                 shift
@@ -214,10 +209,6 @@ EOF
         if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
             echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
         fi
-    fi
-
-    if [[ $BAZEL_BUILD == true ]]; then
-        echo 'BAZEL_BUILD=true' >> repo.conf
     fi
 }
 
