@@ -154,7 +154,7 @@ jobs:
       - name: Upload AnyKernel3
         uses: actions/upload-artifact@v4
         with:
-          name: 'AnyKernel3${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_name }}.zip'
+          name: 'AnyKernel3${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_name }}'
           path: ./workspace/AnyKernel3/*
 
       - name: Upload kernel
