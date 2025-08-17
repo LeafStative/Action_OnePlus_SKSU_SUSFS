@@ -18,7 +18,7 @@ apply_zram_patches() {
 }
 
 apply_manual_hooks_patches() {
-    if [[ $SUSFS_ENABLED == true && $SUKISU_MANUAL_HOOKS == true ]]; then
+    if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'Patching manual hooks'
         cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
         patch -p1 -F 3 < syscall_hooks.patch
@@ -90,13 +90,10 @@ add_sukisu_configs() {
         echo 'CONFIG_KPM=y' >> $config_file
     fi
 
-    if [[ $SUKISU_MANUAL_HOOKS == true && $SUSFS_ENABLED == true ]]; then
+    if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
     else
         echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
-    fi
-
-    if [[ $SUKISU_MANUAL_HOOKS != true ]]; then
         echo 'CONFIG_KPROBES=y' >> $config_file
     fi
 

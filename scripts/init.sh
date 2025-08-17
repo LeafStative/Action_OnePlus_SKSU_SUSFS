@@ -18,7 +18,7 @@ USAGE: $0 [OPTION ...]
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
-      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false, susfs required).
+      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes (default false).
       -s, --susfs                  (bool) Enable susfs integration (default true).
 EOF
 }
@@ -266,12 +266,7 @@ check_args() {
         result=1
     fi
 
-    if [[ $SUKISU == true ]]; then
-        if [[ $SUKISU_MANUAL_HOOKS == true && $susfs_status != true ]]; then
-            echo 'SUSFS is required by SukiSU-Ultra manual hooks, but it is not enabled.'
-            result=1
-        fi
-    else
+    if [[ $SUKISU != true ]]; then
         if [[ $SUKISU_KPM ]]; then
             echo "KernelPatch module support enabled, but SukiSU-Ultra not enabled, ignored."
             unset SUKISU_VER

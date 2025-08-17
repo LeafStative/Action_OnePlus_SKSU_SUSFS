@@ -117,12 +117,7 @@ jobs:
             fi
 
             if [[ '${{ inputs.sukisu_manual_hooks }}' == true ]]; then
-              if [[ '${{ inputs.susfs_enabled }}' == true ]]; then
-                args+=' -m'
-              else
-                echo 'Error: Manual hooks are only supported in SukiSU-Ultra with SUSFS.'
-                exit 1
-              fi
+              args+=' -m'
             fi
           fi
 
