@@ -118,6 +118,9 @@ jobs:
 
             if [[ '${{ inputs.sukisu_manual_hooks }}' == true ]]; then
               args+=' -m'
+              output_string+='_MANUAL'
+            else
+              output_string+='_KPROBES'
             fi
           fi
 
