@@ -133,7 +133,7 @@ jobs:
             -b '${{ inputs.branch }}' \
             -f '${{ inputs.file }}' \
             -n '${{ inputs.kernel_name }}' \
-            -c '${{ inputs.codename }}' ${{ steps.init_args.outputs.args }}
+            -c '${{ inputs.codename }}'${{ steps.init_args.outputs.args }}
 
       - name: Download source code
         run: |
