@@ -57,7 +57,7 @@ apply_susfs_patches() {
     cp ../SukiSU_patch/69_hide_stuff.patch .
 
     echo 'Patching SUSFS'
-    git apply --reject ../50_add_susfs_in_gki-android12-5.10.patch || true
+    git apply --reject 50_add_susfs_in_gki-android12-5.10.patch || true
     patch -p1 < susfs-fix.patch
 
     echo 'Patching 69_hide_stuff.patch'
