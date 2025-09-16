@@ -70,7 +70,7 @@ jobs:
         id: init_args
         run: |
           args=''
-          output_string='oneplus_6_6t'
+          output_string='_oneplus_6_6t'
 
           if [[ '${{ inputs.repo }}' ]]; then
             args+=" -r '${{ inputs.repo }}'"
