@@ -110,23 +110,23 @@ jobs:
 
       - name: Init
         run: |
-          ./scripts/non_gki/oneplus_6_6t/init.sh ${{ steps.init_args.outputs.args }}
+          ./scripts/non_gki/oneplus_6_6t_sdm845/init.sh ${{ steps.init_args.outputs.args }}
 
       - name: Download source code
         run: |
-          ./scripts/non_gki/oneplus_6_6t/download_src.sh
+          ./scripts/non_gki/oneplus_6_6t_sdm845/download_src.sh
 
       - name: Apply patches
         run: |
-          ./scripts/non_gki/oneplus_6_6t/apply_patches.sh
+          ./scripts/non_gki/oneplus_6_6t_sdm845/apply_patches.sh
 
       - name: Build kernel
         run: |
-          ./scripts/non_gki/oneplus_6_6t/build.sh
+          ./scripts/non_gki/oneplus_6_6t_sdm845/build.sh
 
       - name: Make AnyKernel3
         run: |
-          ./scripts/non_gki/oneplus_6_6t/make_ak3.sh
+          ./scripts/non_gki/oneplus_6_6t_sdm845/make_ak3.sh
 
       - name: Upload AnyKernel3
         uses: actions/upload-artifact@v4
