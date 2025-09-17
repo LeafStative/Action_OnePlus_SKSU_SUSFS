@@ -7,6 +7,8 @@ main() {
         exit 1
     fi
 
+    local patches_dir=`realpath patches/oneplus_6_6t_sdm845`
+
     if [[ ! -d workspace ]]; then
         echo 'No workspace found. Please run download_src.sh to download source code first.'
         exit 1
@@ -40,6 +42,7 @@ main() {
     git clone https://github.com/Numbersf/AnyKernel3 --depth=1
     rm -rf ./AnyKernel3/.git
     cp $image_path ./AnyKernel3/
+    cp "$patches_dir/anykernel.sh" ./AnyKernel3/
 
     if [[ $overwrite == true ]]; then
         rm AnyKernel3.zip
