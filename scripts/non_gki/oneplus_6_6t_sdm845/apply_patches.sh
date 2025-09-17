@@ -2,7 +2,7 @@
 
 apply_manual_hooks_patches() {
     echo 'Patching manual hooks'
-    cp "$PATCHES_DIR/syscall-hooks.patch" ./
+    cp "$PATCHES_DIR/syscall-hooks.patch" .
     patch -p1 < syscall-hooks.patch
 }
 
@@ -44,7 +44,7 @@ add_sukisu_configs() {
 configure_kernel_name() {
     local hash=`git rev-parse --short HEAD`
     local kernel_name="-g$hash$KERNEL_SUFFIX"
-    sed -i "\$s|echo \"\\\$res\"|echo \"\\${KERNEL_SUFFIX}\"|" ./scripts/setlocalversion
+    sed -i "\$s|echo \"\\\$res\"|echo \"\\${kernel_name}\"|" ./scripts/setlocalversion
     # sed -i 's|build-timestamp = $(or $(KBUILD_BUILD_TIMESTAMP), $(build-timestamp-auto))|build-timestamp = "Wed Mar 12 08:35:37 UTC 2025"|' ./common/init/Makefile
 }
 
