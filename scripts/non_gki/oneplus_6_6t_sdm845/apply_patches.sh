@@ -2,8 +2,8 @@
 
 apply_manual_hooks_patches() {
     echo 'Patching manual hooks'
-    cp "$PATCHES_DIR/syscall-hooks.patch" .
-    patch -p1 < syscall-hooks.patch
+    cp "$PATCHES_DIR/manual-hooks.patch" .
+    patch -p1 < manual-hooks.patch
 }
 
 add_sukisu_configs() {
