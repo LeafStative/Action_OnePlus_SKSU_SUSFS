@@ -42,7 +42,7 @@ add_sukisu_configs() {
 }
 
 configure_kernel_name() {
-    local hash=`git rev-parse --short HEAD`
+    local hash=`git rev-parse --verify HEAD | cut -c1-12`
     local kernel_name="-g$hash$KERNEL_SUFFIX"
     sed -i "\$s|echo \"\\\$res\"|echo \"\\${kernel_name}\"|" ./scripts/setlocalversion
     # sed -i 's|build-timestamp = $(or $(KBUILD_BUILD_TIMESTAMP), $(build-timestamp-auto))|build-timestamp = "Wed Mar 12 08:35:37 UTC 2025"|' ./common/init/Makefile
