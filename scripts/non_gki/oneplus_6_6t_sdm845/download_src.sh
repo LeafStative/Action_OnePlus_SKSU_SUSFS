@@ -40,7 +40,7 @@ init_sukisu() {
 init_susfs() {
     set -e
     git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10
-    git clone https://github.com/ShirkNeko/SukiSU_patch
+    git clone https://github.com/SukiSU-Ultra/SukiSU_patch
     set +e
 }
 
