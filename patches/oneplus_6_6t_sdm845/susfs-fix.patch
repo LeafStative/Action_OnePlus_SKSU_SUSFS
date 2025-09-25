@@ -1,13 +1,12 @@
 diff --git a/fs/Makefile b/fs/Makefile
-index 3cfd698bbdc8..cc81f1683061 100644
+index 3cfd698bbdc8..5b4103c39ced 100644
 --- a/fs/Makefile
 +++ b/fs/Makefile
-@@ -13,6 +13,9 @@ obj-y :=	open.o read_write.o file_table.o super.o \
+@@ -13,6 +13,8 @@ obj-y :=	open.o read_write.o file_table.o super.o \
  		pnode.o splice.o sync.o utimes.o \
  		stack.o fs_struct.o statfs.o fs_pin.o nsfs.o
  
 +obj-$(CONFIG_KSU_SUSFS) += susfs.o
-+obj-$(CONFIG_KSU_SUSFS_SUS_SU) += sus_su.o
 +
  ifeq ($(CONFIG_BLOCK),y)
  obj-y +=	buffer.o block_dev.o direct-io.o mpage.o
@@ -576,7 +575,7 @@ index 48b2aed7ef67..247ad9273830 100644
  	set_nameidata(&nd, dfd, pathname);
  	filp = path_openat(&nd, op, flags | LOOKUP_RCU);
 diff --git a/fs/namespace.c b/fs/namespace.c
-index 5b59f5e0743e..f45764a5c4c4 100644
+index c571d3575882..29d4fe2d38ba 100644
 --- a/fs/namespace.c
 +++ b/fs/namespace.c
 @@ -25,9 +25,38 @@
