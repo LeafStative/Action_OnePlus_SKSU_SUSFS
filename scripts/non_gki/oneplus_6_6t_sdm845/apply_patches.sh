@@ -10,7 +10,7 @@ add_sukisu_configs() {
     local config_file='./arch/arm64/configs/enchilada_defconfig'
 
     echo 'CONFIG_KSU=y' >> $config_file
-    echo 'CONFIG_KSU_MANUAL_SU=n' >> $config_file
+    echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
     if [[ $SUKISU_DEBUG == true ]]; then
         echo 'CONFIG_KSU_DEBUG=y' >> $config_file

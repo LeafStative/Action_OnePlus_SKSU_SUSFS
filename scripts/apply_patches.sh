@@ -85,7 +85,7 @@ add_sukisu_configs() {
     local config_file='./arch/arm64/configs/gki_defconfig'
 
     echo 'CONFIG_KSU=y' >> $config_file
-    echo 'CONFIG_KSU_MANUAL_SU=n' >> $config_file
+    echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
     if [[ $SUKISU_KPM == true ]]; then
         echo 'CONFIG_KPM=y' >> $config_file
