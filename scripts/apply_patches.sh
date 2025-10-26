@@ -114,6 +114,7 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
+        echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
 
         if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
             echo 'CONFIG_KSU_SUSFS_SUS_SU=n' >> $config_file
