@@ -20,8 +20,8 @@ apply_zram_patches() {
 apply_manual_hooks_patches() {
     if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'Patching manual hooks'
-        cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
-        patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
+        cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
+        patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
     fi
 }
 
