@@ -83,7 +83,7 @@ jobs:
           git config --global user.email "leafstative@gmail.com"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure init arguments
         id: init_args
@@ -152,13 +152,13 @@ jobs:
           ./scripts/make_ak3.sh
 
       - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: 'AnyKernel3${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_name }}'
           path: ./workspace/AnyKernel3/*
 
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: 'Image${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_name }}'
           path: ./workspace/out/dist/Image
