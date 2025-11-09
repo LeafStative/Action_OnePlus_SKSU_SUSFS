@@ -40,9 +40,7 @@ main() {
     rm -rf ./AnyKernel3/.git
     cp out/dist/Image ./AnyKernel3/
 
-    if [[ $overwrite == true ]]; then
-        rm AnyKernel3.zip
-    fi
+    [[ $overwrite == true ]] && rm AnyKernel3.zip
 
     pushd AnyKernel3
     zip -rv ../AnyKernel3.zip *

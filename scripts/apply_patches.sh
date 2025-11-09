@@ -53,10 +53,8 @@ add_lz4kd_configs() {
         sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' $config_file
     fi
 
-    if [[ $android_version = 'android14' ]] || [[ $android_version = 'android15' ]]; then
-        if [[ -e './modules.bzl' ]]; then
-            sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' './modules.bzl'
-        fi
+    if [[ $android_version == 'android14' || $android_version == 'android15' ]]; then
+        [[ -e './modules.bzl' ]] && sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' './modules.bzl'
 
         if [[ -e '../msm-kernel/modules.bzl' ]]; then
             sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' '../msm-kernel/modules.bzl'
@@ -65,7 +63,7 @@ add_lz4kd_configs() {
         fi
 
         echo 'CONFIG_MODULE_SIG_FORCE=n' >> $config_file
-    elif [[ $kernel_version = '5.10' ]] || [[ $kernel_version = '5.15' ]]; then
+    elif [[ $kernel_version == '5.10' || $kernel_version == '5.15' ]]; then
         rm ./android/gki_aarch64_modules
         touch ./android/gki_aarch64_modules
     fi
@@ -87,9 +85,7 @@ add_sukisu_configs() {
     echo 'CONFIG_KSU=y' >> $config_file
     echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
-    if [[ $SUKISU_KPM == true ]]; then
-        echo 'CONFIG_KPM=y' >> $config_file
-    fi
+    [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
         echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
@@ -116,18 +112,13 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
 
-        if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
-            echo 'CONFIG_KSU_SUSFS_SUS_SU=n' >> $config_file
-        else
-            echo 'CONFIG_KSU_SUSFS_SUS_SU=y' >> $config_file
-        fi
+        local sus_su=$( [[ $SUKISU_MANUAL_HOOKS == true ]] && echo 'n' || echo 'y' )
+        echo "CONFIG_KSU_SUSFS_SUS_SU=$sus_su" >> $config_file
     fi
 
     sed -i 's/check_defconfig//' ./build.config.gki
 
-    if [[ $ZRAM_ENABLED == true ]]; then
-        add_lz4kd_configs $config_file
-    fi
+    [[ $ZRAM_ENABLED == true ]] && add_lz4kd_configs $config_file
 
     popd
 }
@@ -163,9 +154,7 @@ apply_susfs_patches() {
 
     popd
 
-    if [[ $ZRAM_ENABLED == true ]]; then
-        apply_zram_patches
-    fi
+    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches
 
     popd
 }
@@ -184,16 +173,12 @@ main() {
     pushd workspace
 
     if [[ $SUKISU == true ]]; then
-        if [[ $SUSFS_ENABLED == true ]]; then
-            apply_susfs_patches
-        fi
+        [[ $SUSFS_ENABLED == true ]] && apply_susfs_patches
 
         add_sukisu_configs
     fi
 
-    if [[ $SCHED_ENABLED == true ]]; then
-        add_sched
-    fi
+    [[ $SCHED_ENABLED == true ]] && add_sched
 
     configure_kernel_name
 

@@ -177,9 +177,7 @@ parse_args() {
 
 write_config() {
     echo -n > repo.conf
-    if [[ $REPO_URL ]]; then
-        echo "REPO_URL='$REPO_URL'" >> repo.conf
-    fi
+    [[ $REPO_URL ]] && echo "REPO_URL='$REPO_URL'" >> repo.conf
 
     cat >> repo.conf << EOF
 REPO_BRANCH='$REPO_BRANCH'
@@ -188,47 +186,23 @@ KERNEL_NAME='$KERNEL_NAME'
 CPU_CODENAME=$CPU_CODENAME
 EOF
 
-    if [[ $GKI_ABI ]]; then
-        echo "GKI_ABI=$GKI_ABI" >> repo.conf
-    fi
-
-    if [[ $ZRAM_ENABLED == true ]]; then
-        echo 'ZRAM_ENABLED=true' >> repo.conf
-    fi
-
-    if [[ $SCHED_ENABLED == true ]]; then
-        echo 'SCHED_ENABLED=true' >> repo.conf
-    fi
+    [[ $GKI_ABI ]] && echo "GKI_ABI=$GKI_ABI" >> repo.conf
+    [[ $ZRAM_ENABLED == true ]] && echo 'ZRAM_ENABLED=true' >> repo.conf
+    [[ $SCHED_ENABLED == true ]] && echo 'SCHED_ENABLED=true' >> repo.conf
 
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        if [[ $SUKISU_KPM ]]; then
-            echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
-        fi
-
-        if [[ $SUKISU_VER ]]; then
-            echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
-        fi
-
-        if [[ $SUSFS_ENABLED ]]; then
-            echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
-        fi
-
-        if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
-            echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
-        fi
+        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.con
+        [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.con
+        [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
+        [[ $SUKISU_MANUAL_HOOKS == true ]] && echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
     fi
 }
 
 check_args() {
     local result=0
-
-    if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
-        local susfs_status=true
-    else
-        local susfs_status=false
-    fi
+    local susfs_status=$( [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]] && echo true || echo false )
 
     if [[ ! $REPO_BRANCH ]]; then
         echo 'No repo branch specified.'
@@ -288,9 +262,7 @@ check_args() {
         fi
     fi
 
-    if [[ $result -ne 0 ]]; then
-        echo "Try '$0 --help' for more information."
-    fi
+    [[ $result -ne 0 ]] && echo "Try '$0 --help' for more information."
 
     return $result
 }
@@ -298,13 +270,8 @@ check_args() {
 main() {
     parse_args $@
 
-    if ! check_args; then
-        exit 1
-    fi
-
-    if ! check_environment; then
-        exit 1
-    fi
+    check_args || exit 1
+    check_environment || exit 1
 
     local script_dir=`dirname $(realpath "$0")`
 

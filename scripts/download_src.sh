@@ -43,12 +43,7 @@ init_sukisu() {
 
     pushd ./KernelSU
 
-    local sukisu_ver
-    if [[ $SUKISU_VER ]]; then
-        sukisu_ver=$SUKISU_VER
-    else
-        sukisu_ver=$(( $(git rev-list --count main) + 10606 ))
-    fi
+    local sukisu_ver=$( [[ $SUKISU_VER ]] && echo $SUKISU_VER || echo "$(( $( git rev-list --count main ) + 10606 ))" )
 
     sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=$sukisu_ver/" kernel/Makefile
     echo "SukiSU-Ultra version: $sukisu_ver"
@@ -75,16 +70,12 @@ main() {
 
     init_repo
 
-    if [[ $SCHED_ENABLED == true ]]; then
-        init_sched
-    fi
+    [[ $SCHED_ENABLED == true ]] && init_sched
 
     if [[ $SUKISU == true ]]; then
         init_sukisu
 
-        if [[ $SUSFS_ENABLED == true ]]; then
-            init_susfs
-        fi
+        [[ $SUSFS_ENABLED == true ]] && init_susfs
     fi
 
     popd
