@@ -73,9 +73,10 @@ jobs:
           remove-codeql: 'true'
 
       - name: Install dependencies
-        run: |
-          sudo apt update && sudo apt upgrade -y
-          sudo apt install -y python3 git curl
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: python3 git curl
+          execute_install_scripts: true
 
       - name: Configure Git
         run: |
