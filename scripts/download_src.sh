@@ -43,10 +43,10 @@ init_sukisu() {
 
     pushd ./KernelSU
 
-    local sukisu_ver=$( [[ $SUKISU_VER ]] && echo $SUKISU_VER || echo "$(( $( git rev-list --count main ) + 10606 ))" )
-
-    sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=$sukisu_ver/" kernel/Makefile
-    echo "SukiSU-Ultra version: $sukisu_ver"
+    if [[ $SUKISU_VER ]]; then
+        sed -i 's/DKSU_VERSION_FULL=\\"\$(KSU_VERSION_FULL)\\"/DKSU_VERSION_FULL=\\"'"$SUKISU_VER"'\\"/' kernel/Makefile
+        echo "Custom SukiSU-Ultra version: $SUKISU_VER"
+    fi
 
     popd
     popd
