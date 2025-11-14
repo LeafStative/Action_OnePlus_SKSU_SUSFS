@@ -7,15 +7,13 @@ init_repo() {
     $repo init -u "$REPO_URL" -b "$REPO_BRANCH" -m "$MANIFEST_FILE" --depth=1
     $repo --trace sync -c -j$(nproc) --no-tags --fail-fast
 
-    if [ -e 'kernel_platform/common/BUILD.bazel' ]; then
+    [[ -e 'kernel_platform/common/BUILD.bazel' ]] &&
         sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' \
         kernel_platform/common/BUILD.bazel
-    fi
 
-    if [[ -e 'kernel_platform/msm-kernel/BUILD.bazel' ]]; then
+    [[ -e 'kernel_platform/msm-kernel/BUILD.bazel' ]] &&
         sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' \
         kernel_platform/msm-kernel/BUILD.bazel
-    fi
 
     rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
     rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
@@ -55,12 +53,19 @@ init_sukisu() {
 
 init_susfs() {
     set -e
-    git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "gki-$GKI_ABI"
+
+    local gki_abi=$(extract_gki_abi kernel_platform/common)
+    echo "Detected GKI ABI: $gki_abi"
+
+    git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "gki-$gki_abi"
     git clone https://github.com/SukiSU-Ultra/SukiSU_patch
     set +e
 }
 
 main() {
+    local script_dir=$(dirname $(realpath "$0"))
+    source "$script_dir/lib/utils.sh"
+
     REPO_URL='https://github.com/OnePlusOSS/kernel_manifest'
     SUSFS_ENABLED=true
     source repo.conf

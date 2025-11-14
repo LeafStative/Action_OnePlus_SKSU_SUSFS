@@ -14,17 +14,6 @@ on:
         description: 'Manifest file name'
         required: true
         default: 'oneplus_ace2_v.xml'
-      gki_abi:
-        description: 'GKI ABI'
-        required: false
-        type: choice
-        options:
-          - android12-5.10
-          - android13-5.10
-          - android13-5.15
-          - android14-5.15
-          - android14-6.1
-          - android15-6.6
       kernel_name:
         description: 'Kernel name'
         required: true
@@ -106,12 +95,6 @@ jobs:
             fi
 
             if [[ '${{ inputs.susfs_enabled }}' == true ]]; then
-              if [[ ! '${{ inputs.gki_abi }}' ]]; then
-                echo 'Error: GKI ABI is required when susfs is enabled.'
-                exit 1
-              fi
-
-              args+=" -g '${{ inputs.gki_abi }}'"
               output_string+='_SUSFS'
             else
               args+=' -s false'

@@ -160,9 +160,14 @@ apply_susfs_patches() {
 }
 
 main() {
+    local script_dir=$(dirname $(realpath "$0"))
+    source "$script_dir/lib/utils.sh"
+
     SUSFS_ENABLED=true
     SUKISU_KPM=true
     source repo.conf
+
+    GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
 
     if [[ ! -d workspace ]]; then
         echo 'No workspace found. Please run download_src.sh to download source code first.'

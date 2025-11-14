@@ -10,7 +10,6 @@ USAGE: $0 [OPTION ...]
       -r, --repo                   Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
       -b, --branch                 Kernel manifest repo branch.
       -f, --file                   Kernel manifest file name.
-      -g, --gki-abi                Kernel GKI ABI (required if susfs or zram enabled).
       -n, --kernel-name            Custom Kernel name.
       -c, --codename               CPU code name.
       -z, --zram                   (bool) Integrate ZRAM patches (default false).
@@ -58,20 +57,9 @@ check_environment() {
     return 0
 }
 
-check_gki_abi() {
-    case "$1" in
-        android12-5.10|android13-5.10|android13-5.15|android14-5.15|android14-6.1|android15-6.6)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
 parse_args() {
-    local args=$(getopt -o hr:b:f:g:n:c:zSkK::v:ms:: \
-    -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
+    local args=$(getopt -o hr:b:f:n:c:zSkK::v:ms:: \
+    -l help,repo:,branch:,file:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -96,10 +84,6 @@ parse_args() {
                 ;;
             -f|--file)
                 MANIFEST_FILE="$2"
-                shift 2
-                ;;
-            -g|--gki-abi)
-                GKI_ABI="$2"
                 shift 2
                 ;;
             -n|--kernel-name)
@@ -186,7 +170,6 @@ KERNEL_NAME='$KERNEL_NAME'
 CPU_CODENAME=$CPU_CODENAME
 EOF
 
-    [[ $GKI_ABI ]] && echo "GKI_ABI=$GKI_ABI" >> repo.conf
     [[ $ZRAM_ENABLED == true ]] && echo 'ZRAM_ENABLED=true' >> repo.conf
     [[ $SCHED_ENABLED == true ]] && echo 'SCHED_ENABLED=true' >> repo.conf
 
@@ -221,22 +204,6 @@ check_args() {
 
     if [[ ! $CPU_CODENAME ]]; then
         echo 'No cpu codename specified.'
-        result=1
-    fi
-
-    local gki_required=$( [[ $ZRAM_ENABLED || ( $SUKISU == true && $susfs_status == true ) ]] && echo true || echo false )
-    if [[ $GKI_ABI ]]; then
-        if [[ $gki_required == true ]]; then
-            if ! check_gki_abi "$GKI_ABI"; then
-                echo "Invalid GKI ABI '$GKI_ABI'."
-                result=1
-            fi
-        else
-            echo 'GKI ABI specified, but ZRAM or SukiSU-Ultra with SUSFS not enabled, ignored.'
-            unset GKI_ABI
-        fi
-    elif [[ $gki_required == true ]]; then
-        echo 'ZRAM or SukiSU-Ultra with SUSFS enabled, but no GKI ABI specified.'
         result=1
     fi
 
