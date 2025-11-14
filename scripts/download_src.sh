@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-repo=`realpath tools/repo`
+repo=$(realpath tools/repo)
 
 init_repo() {
     set -e

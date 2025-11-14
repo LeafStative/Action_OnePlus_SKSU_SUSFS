@@ -52,7 +52,7 @@ main() {
         exit 1
     fi
 
-    local kernel_version=`strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+'`
+    local kernel_version=$(strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+')
 
     echo "Kernel version: $kernel_version"
 

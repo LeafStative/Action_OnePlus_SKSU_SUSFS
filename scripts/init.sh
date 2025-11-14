@@ -70,9 +70,9 @@ check_gki_abi() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:f:g:n:c:zSkK::v:ms:: \
+    local args=$(getopt -o hr:b:f:g:n:c:zSkK::v:ms:: \
     -l help,repo:,branch:,file:,gki-abi:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
-    -n "$0" -- "$@"`
+    -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
         help_message
@@ -273,7 +273,7 @@ main() {
     check_args || exit 1
     check_environment || exit 1
 
-    local script_dir=`dirname $(realpath "$0")`
+    local script_dir=$(dirname $(realpath "$0"))
 
     if [[ ! -f 'tools/repo' || ! -f 'tools/magiskboot' ]]; then
         echo "Tools not found, downloading..."

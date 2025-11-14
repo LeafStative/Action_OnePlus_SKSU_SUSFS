@@ -3,7 +3,7 @@
 patch_kpm() {
     echo 'KernelPatch module enabled, patching kernel image'
 
-    local image_dir=`dirname $1`
+    local image_dir=$(dirname $1)
     cp ../SukiSU_patch/kpm/patch_linux "$image_dir"
     pushd $image_dir
 
@@ -30,7 +30,7 @@ main() {
         export -f python
     fi
 
-    local tools_path=`realpath workspace/toolchain`
+    local tools_path=$(realpath workspace/toolchain)
 
     PATH="$tools_path/linaro-gcc-4.9/aarch64-linux-gnu/bin:$PATH"
     PATH="$tools_path/linaro-gcc-4.9/arm-linux-gnueabi/bin:$PATH"
@@ -70,7 +70,7 @@ main() {
         exit 1
     fi
 
-    local kernel_version=`strings $image_path | grep -oP '(?<=Linux version )\d\S+'`
+    local kernel_version=$(strings $image_path | grep -oP '(?<=Linux version )\d\S+')
 
     echo "Kernel version: $kernel_version"
 

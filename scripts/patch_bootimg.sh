@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-magiskboot=`realpath tools/magiskboot`
+magiskboot=$(realpath tools/magiskboot)
 
 main() {
     if [[ ! -d workspace ]]; then
@@ -8,7 +8,7 @@ main() {
         exit 1
     fi
 
-    local stock_img=`realpath "$1"`
+    local stock_img=$(realpath "$1")
     if [[ ! -e $stock_img ]]; then
         echo "File '$stock_img' not exist!"
         exit 1

@@ -2,7 +2,7 @@
 
 download_magiskboot() {
     local workdir=$1
-    local urls=`curl 'https://api.github.com/repos/topjohnwu/Magisk/releases' | jq -r '.[0].assets[].browser_download_url'`
+    local urls=$(curl 'https://api.github.com/repos/topjohnwu/Magisk/releases' | jq -r '.[0].assets[].browser_download_url')
     for url in $urls; do
         if [[ $url =~ 'app-release.apk' || $url =~ Magisk-v.+\.apk ]]; then
             local apk_url=$url

@@ -7,7 +7,7 @@ main() {
         exit 1
     fi
 
-    local patches_dir=`realpath patches/oneplus_6_6t_sdm845`
+    local patches_dir=$(realpath patches/oneplus_6_6t_sdm845)
 
     if [[ ! -d workspace ]]; then
         echo 'No workspace found. Please run download_src.sh to download source code first.'

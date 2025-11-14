@@ -54,9 +54,9 @@ check_environment() {
 }
 
 parse_args() {
-    local args=`getopt -o hr:b:S:kdK::v:s:: \
+    local args=$(getopt -o hr:b:S:kdK::v:s:: \
     -l help,repo:,branch:,kernel-suffix:,sukisu,sukisu-debug,sukisu-kpm::,sukisu-version:,susfs:: \
-    -n "$0" -- "$@"`
+    -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
         help_message
@@ -216,8 +216,8 @@ main() {
         exit 1
     fi
 
-    local script_dir=`dirname $(realpath "$0")`
-    script_dir=`readlink -f "$script_dir/../.."`
+    local script_dir=$(dirname $(realpath "$0"))
+    script_dir=$(readlink -f "$script_dir/../..")
     if [[ ! -f 'tools/repo' || ! -f 'tools/magiskboot' ]]; then
         echo "Tools not found, downloading..."
 
