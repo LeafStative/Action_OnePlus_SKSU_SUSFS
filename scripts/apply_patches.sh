@@ -18,11 +18,13 @@ apply_zram_patches() {
 }
 
 apply_manual_hooks_patches() {
-    if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
-        echo 'Patching manual hooks'
-        cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
-        patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
-    fi
+    pushd ./kernel_platform/common
+
+    echo 'Patching manual hooks'
+    cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
+    patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
+
+    popd
 }
 
 add_lz4kd_configs() {
@@ -150,8 +152,6 @@ apply_susfs_patches() {
     echo 'Patching 69_hide_stuff.patch'
     patch -p1 -F 3 < 69_hide_stuff.patch
 
-    apply_manual_hooks_patches
-
     popd
 
     [[ $ZRAM_ENABLED == true ]] && apply_zram_patches
@@ -167,8 +167,6 @@ main() {
     SUKISU_KPM=true
     source repo.conf
 
-    GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
-
     if [[ ! -d workspace ]]; then
         echo 'No workspace found. Please run download_src.sh to download source code first.'
         exit 1
@@ -181,6 +179,7 @@ main() {
 
     if [[ $SUKISU == true ]]; then
         [[ $SUSFS_ENABLED == true ]] && apply_susfs_patches
+        [[ $SUKISU_MANUAL_HOOKS == true ]] && apply_manual_hooks_patches
 
         add_sukisu_configs
     fi
