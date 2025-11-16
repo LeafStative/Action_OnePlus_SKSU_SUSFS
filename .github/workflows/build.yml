@@ -32,16 +32,16 @@ on:
         required: true
         type: boolean
         default: true
-      sukisu_manual_hooks:
-        description: 'Use manual hooks to integrate SukiSU-Ultra'
-        required: true
-        type: boolean
-        default: true
       susfs_enabled:
         description: 'Enable susfs'
         required: true
         type: boolean
         default: true
+      sukisu_manual_hooks:
+        description: 'Use manual hooks to integrate SukiSU-Ultra. Cannot work with SUSFS'
+        required: true
+        type: boolean
+        default: false
 
 permissions: 
   contents: read
