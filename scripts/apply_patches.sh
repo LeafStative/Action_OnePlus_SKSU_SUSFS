@@ -177,6 +177,8 @@ main() {
     set -e
     pushd workspace
 
+    GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
+
     if [[ $SUKISU == true ]]; then
         [[ $SUSFS_ENABLED == true ]] && apply_susfs_patches
 
