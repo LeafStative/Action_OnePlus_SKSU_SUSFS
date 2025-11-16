@@ -98,13 +98,11 @@ add_sukisu_configs() {
 
     if [[ $SUSFS_ENABLED == true ]]; then
         echo 'CONFIG_KSU_SUSFS=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_KSTAT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n' >> $config_file
         echo 'CONFIG_KSU_SUSFS_TRY_UMOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SPOOF_UNAME=y' >> $config_file
@@ -113,9 +111,6 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
-
-        local sus_su=$( [[ $SUKISU_MANUAL_HOOKS == true ]] && echo 'n' || echo 'y' )
-        echo "CONFIG_KSU_SUSFS_SUS_SU=$sus_su" >> $config_file
     fi
 
     sed -i 's/check_defconfig//' ./build.config.gki
