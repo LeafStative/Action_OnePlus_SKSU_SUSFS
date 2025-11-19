@@ -7,16 +7,16 @@ USAGE: $0 [OPTION ...]
 
     Options:
       -h, --help                   Show this help message and exit.
-      -r, --repo                   Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
-      -b, --branch                 Kernel manifest repo branch.
-      -f, --file                   Kernel manifest file name.
-      -n, --kernel-name            Custom Kernel name.
-      -c, --codename               CPU code name.
+      -r, --repo <repo_url>        Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
+      -b, --branch <branch_name>   Kernel manifest repo branch.
+      -f, --file <filename>        Kernel manifest file name.
+      -n, --kernel-name <name>     Custom Kernel name.
+      -c, --codename <codename>    CPU code name.
       -z, --zram                   (bool) Integrate ZRAM patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
-      -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
+      -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
       -H, --sukisu-hook <hook>     Sukisu-Ultra hook type selection, available options:
                                      susfs (default)
                                      manual
