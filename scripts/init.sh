@@ -118,7 +118,7 @@ parse_args() {
                         shift 2
                         ;;
                     *)
-                        echo "Invalid susfs status '$2'."
+                        echo "Invalid KPM value '$2'."
                         exit 1
                         ;;
                 esac
