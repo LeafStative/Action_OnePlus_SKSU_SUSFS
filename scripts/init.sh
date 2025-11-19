@@ -10,7 +10,7 @@ USAGE: $0 [OPTION ...]
       -r, --repo <repo_url>        Kernel manifest repo url (default OnePlusOSS/kernel_manifest).
       -b, --branch <branch_name>   Kernel manifest repo branch.
       -f, --file <filename>        Kernel manifest file name.
-      -n, --kernel-name <name>     Custom Kernel name.
+      -s, --kernel-suffix <suffix> Custom Kernel suffix.
       -c, --codename <codename>    CPU code name.
       -z, --zram                   (bool) Integrate ZRAM patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
@@ -71,8 +71,8 @@ check_sukisu_hook() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:n:c:zSkK::v:H: \
-    -l help,repo:,branch:,file:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zSkK::v:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -99,8 +99,8 @@ parse_args() {
                 MANIFEST_FILE="$2"
                 shift 2
                 ;;
-            -n|--kernel-name)
-                KERNEL_NAME="$2"
+            -s|--kernel-suffix)
+                KERNEL_SUFFIX="$2"
                 shift 2
                 ;;
             -c|--codename)
@@ -163,7 +163,7 @@ write_config() {
     cat >> repo.conf << EOF
 REPO_BRANCH='$REPO_BRANCH'
 MANIFEST_FILE='$MANIFEST_FILE'
-KERNEL_NAME='$KERNEL_NAME'
+KERNEL_SUFFIX='$KERNEL_SUFFIX'
 CPU_CODENAME=$CPU_CODENAME
 EOF
 
@@ -192,8 +192,8 @@ check_args() {
         result=1
     fi
 
-    if [[ ! $KERNEL_NAME ]]; then
-        echo 'No kernel name specified.'
+    if [[ ! $KERNEL_SUFFIX ]]; then
+        echo 'No kernel suffix specified.'
         result=1
     fi
 

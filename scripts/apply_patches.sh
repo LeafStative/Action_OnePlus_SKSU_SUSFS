@@ -91,29 +91,29 @@ add_sukisu_configs() {
 
     case "$SUKISU_HOOK" in
         manual)
-        echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
+            echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
             ;;
         kprobes)
-        echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
-        echo 'CONFIG_KPROBES=y' >> $config_file
+            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+            echo 'CONFIG_KPROBES=y' >> $config_file
             ;;
         susfs)
             echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
 
-        echo 'CONFIG_KSU_SUSFS=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_KSTAT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_TRY_UMOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SPOOF_UNAME=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_ENABLE_LOG=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SUS_KSTAT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_TRY_UMOUNT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SPOOF_UNAME=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_ENABLE_LOG=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
+            echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
             ;;
     esac
 
@@ -130,7 +130,7 @@ add_sched() {
 
 configure_kernel_name() {
     pushd ./kernel_platform
-    sed -i "\$s|echo \"\\\$res\"|echo \"\\${KERNEL_NAME}\"|" ./common/scripts/setlocalversion
+    sed -i "\$s|echo \"\\\$res\"|echo \"\\${KERNEL_SUFFIX}\"|" ./common/scripts/setlocalversion
     sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl || true
     # sed -i 's|build-timestamp = $(or $(KBUILD_BUILD_TIMESTAMP), $(build-timestamp-auto))|build-timestamp = "Wed Mar 12 08:35:37 UTC 2025"|' ./common/init/Makefile
     popd
