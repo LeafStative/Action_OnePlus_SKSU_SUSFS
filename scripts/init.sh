@@ -177,8 +177,8 @@ EOF
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.con
-        [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.con
+        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
         [[ $SUKISU_MANUAL_HOOKS == true ]] && echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
     fi
