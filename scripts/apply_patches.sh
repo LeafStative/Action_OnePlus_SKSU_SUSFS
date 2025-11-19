@@ -89,14 +89,17 @@ add_sukisu_configs() {
 
     [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
 
-    if [[ $SUKISU_MANUAL_HOOKS == true ]]; then
+    case "$SUKISU_HOOK" in
+        manual)
         echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file 
-    else
+            ;;
+        kprobes)
         echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
         echo 'CONFIG_KPROBES=y' >> $config_file
-    fi
+            ;;
+        susfs)
+            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
 
-    if [[ $SUSFS_ENABLED == true ]]; then
         echo 'CONFIG_KSU_SUSFS=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
@@ -111,7 +114,8 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
-    fi
+            ;;
+    esac
 
     sed -i 's/check_defconfig//' ./build.config.gki
 
@@ -158,8 +162,8 @@ main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
 
-    SUSFS_ENABLED=true
     SUKISU_KPM=true
+    SUKISU_HOOK=susfs
     source repo.conf
 
     if [[ ! -d workspace ]]; then
@@ -173,8 +177,14 @@ main() {
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
 
     if [[ $SUKISU == true ]]; then
-        [[ $SUSFS_ENABLED == true ]] && apply_susfs_patches
-        [[ $SUKISU_MANUAL_HOOKS == true ]] && apply_manual_hooks_patches
+        case $SUKISU_HOOK in
+            susfs)
+                apply_susfs_patches
+                ;;
+            manual)
+                apply_manual_hooks_patches
+                ;;
+        esac
 
         add_sukisu_configs
     fi

@@ -32,16 +32,15 @@ on:
         required: true
         type: boolean
         default: true
-      susfs_enabled:
-        description: 'Enable susfs'
+      sukisu_hook:
+        description: 'SUSFS / Hook type selection'
         required: true
-        type: boolean
-        default: true
-      sukisu_manual_hooks:
-        description: 'Use manual hooks to integrate SukiSU-Ultra. Cannot work with SUSFS'
-        required: true
-        type: boolean
-        default: false
+        type: choice
+        default: susfs
+        options:
+          - susfs
+          - manual
+          - kprobes
 
 permissions: 
   contents: read
@@ -94,18 +93,19 @@ jobs:
               output_string+='_KPM'
             fi
 
-            if [[ '${{ inputs.susfs_enabled }}' == true ]]; then
-              output_string+='_SUSFS'
-            else
-              args+=' -s false'
-            fi
-
-            if [[ '${{ inputs.sukisu_manual_hooks }}' == true ]]; then
-              args+=' -m'
-              output_string+='_MANUAL'
-            else
-              output_string+='_KPROBES'
-            fi
+            case '${{ inputs.sukisu_hook }}' in
+              susfs)
+                output_string+='_SUSFS'
+                ;;
+              manual)
+                args+=' -H manual'
+                output_string+='_MANUAL'
+                ;;
+              kprobes)
+                args+=' -H kprobes'
+                output_string+='_KPROBES'
+                ;;
+            esac
           fi
 
           echo "args=$args" >> $GITHUB_OUTPUT

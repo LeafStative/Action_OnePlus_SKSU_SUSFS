@@ -32,7 +32,7 @@ init_sched() {
 }
 
 init_sukisu() {
-    local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-' )
+    local init_args=$( [[ $SUKISU_HOOK == 'susfs' ]] && echo '-s susfs-main' || echo '-' )
 
     set -e
     pushd ./kernel_platform
@@ -67,7 +67,7 @@ main() {
     source "$script_dir/lib/utils.sh"
 
     REPO_URL='https://github.com/OnePlusOSS/kernel_manifest'
-    SUSFS_ENABLED=true
+    SUKISU_HOOK=susfs
     source repo.conf
 
     mkdir -p workspace
@@ -80,7 +80,7 @@ main() {
     if [[ $SUKISU == true ]]; then
         init_sukisu
 
-        [[ $SUSFS_ENABLED == true ]] && init_susfs
+        [[ $SUKISU_HOOK == 'susfs' ]] && init_susfs
     fi
 
     popd

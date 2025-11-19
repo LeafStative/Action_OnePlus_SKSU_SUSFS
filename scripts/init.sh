@@ -17,9 +17,10 @@ USAGE: $0 [OPTION ...]
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
       -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
-      -s, --susfs                  (bool) Enable susfs integration (default true).
-      -m, --sukisu-manual-hooks    (bool) Implementation using manual hooks instead of kprobes.
-                                   Cannot work together with SUSFS (default false).
+      -H, --sukisu-hook <hook>     Sukisu-Ultra hook type selection, available options:
+                                     susfs (default)
+                                     manual
+                                     kprobes
 EOF
 }
 
@@ -58,9 +59,20 @@ check_environment() {
     return 0
 }
 
+check_sukisu_hook() {
+    case "$1" in
+        susfs|manual|kprobes)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 parse_args() {
-    local args=$(getopt -o hr:b:f:n:c:zSkK::v:ms:: \
-    -l help,repo:,branch:,file:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-manual-hooks,susfs:: \
+    local args=$(getopt -o hr:b:f:n:c:zSkK::v:H: \
+    -l help,repo:,branch:,file:,kernel-name:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -127,25 +139,9 @@ parse_args() {
                 SUKISU_VER="$2"
                 shift 2
                 ;;
-            -m|--sukisu-manual-hooks)
-                SUKISU_MANUAL_HOOKS=true
-                shift 1
-                ;;
-            -s|--susfs)
-                case "$2" in
-                    ''|true)
-                        SUSFS_ENABLED=true
-                        shift 2
-                        ;;
-                    false)
-                        SUSFS_ENABLED=false
-                        shift 2
-                        ;;
-                    *)
-                        echo "Invalid susfs status '$2'."
-                        exit 1
-                        ;;
-                esac
+            -H|--sukisu-hook)
+                SUKISU_HOOK="$2"
+                shift 2
                 ;;
 
             --)
@@ -179,14 +175,12 @@ EOF
 
         [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
-        [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
-        [[ $SUKISU_MANUAL_HOOKS == true ]] && echo 'SUKISU_MANUAL_HOOKS=true' >> repo.conf
+        [[ $SUKISU_HOOK ]] && echo "SUKISU_HOOK=$SUKISU_HOOK" >> repo.conf
     fi
 }
 
 check_args() {
     local result=0
-    local susfs_status=$( [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]] && echo true || echo false )
 
     if [[ ! $REPO_BRANCH ]]; then
         echo 'No repo branch specified.'
@@ -219,17 +213,12 @@ check_args() {
             unset SUKISU_VER
         fi
 
-        if [[ $SUSFS_ENABLED ]]; then
-            echo "SUSFS status manually specified, but SukiSU-Ultra not enabled, ignored."
-            unset SUSFS_ENABLED
+        if [[ $SUKISU_HOOK ]]; then
+            echo "SukiSU-Ultra hook type '$SUKISU_HOOK' specified, but SukiSU-Ultra not enabled, ignored."
+            unset SUKISU_HOOK
         fi
-
-        if [[ $SUKISU_MANUAL_HOOKS ]]; then
-            echo "SukiSU-Ultra manual hooks specified, but SukiSU-Ultra not enabled, ignored."
-            unset SUKISU_MANUAL_HOOKS
-        fi
-    elif [[ $susfs_status == true && $SUKISU_MANUAL_HOOKS == true ]]; then
-        echo "SUSFS cannot work with SukiSU-Ultra manual hooks implementation."
+    elif [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
+        echo "Invalid SukiSU-Ultra hook type '$SUKISU_HOOK'."
         result=1
     fi
 
