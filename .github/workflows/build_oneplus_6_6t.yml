@@ -54,9 +54,10 @@ jobs:
           remove-codeql: 'true'
 
       - name: Install dependencies
-        run: |
-          sudo apt update && sudo apt upgrade -y
-          sudo apt install -y python3 git curl
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: python3 git curl
+          execute_install_scripts: true
 
       - name: Configure Git
         run: |
@@ -64,7 +65,7 @@ jobs:
           git config --global user.email "leafstative@gmail.com"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure init arguments
         id: init_args
@@ -110,7 +111,7 @@ jobs:
 
       - name: Init
         run: |
-          ./scripts/non_gki/oneplus_6_6t_sdm845/init.sh ${{ steps.init_args.outputs.args }}
+          ./scripts/non_gki/oneplus_6_6t_sdm845/init.sh${{ steps.init_args.outputs.args }}
 
       - name: Download source code
         run: |
@@ -129,13 +130,13 @@ jobs:
           ./scripts/non_gki/oneplus_6_6t_sdm845/make_ak3.sh
 
       - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: 'AnyKernel3${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_suffix }}'
           path: ./workspace/AnyKernel3/*
 
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: 'Image${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_suffix }}'
           path: ./workspace/AnyKernel3/Image
