@@ -7,13 +7,13 @@ USAGE: $0 [OPTION ...]
 
     Options:
       -h, --help                   Show this help message and exit.
-      -r, --repo                   Kernel source repo (default LineageOS/android_kernel_oneplus_sdm845).
-      -b, --branch                 Kernel source repo branch (optional).
-      -S, --kernel-suffix          Custom Kernel suffix (optional).
+      -r, --repo <owner/repo>      Kernel source repo (default LineageOS/android_kernel_oneplus_sdm845).
+      -b, --branch <branch>        Kernel source repo branch (optional).
+      -S, --kernel-suffix <suffix> Custom Kernel suffix (optional).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -d, --sukisu-debug           (bool) Enable SukiSU-Ultra debug mode (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
-      -v, --sukisu-version         Custom SukiSU-Ultra version string (optional).
+      -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
       -s, --susfs                  (bool) Enable susfs integration (default true).
 EOF
 }
