@@ -74,9 +74,7 @@ main() {
 
     echo "Kernel version: $kernel_version"
 
-    if [[ $SUKISU_KPM == true ]]; then
-        patch_kpm $image_path
-    fi
+    [[ $SUKISU_KPM == true ]] && patch_kpm $image_path
 
     popd
 

@@ -44,9 +44,7 @@ main() {
     cp $image_path ./AnyKernel3/
     cp "$patches_dir/anykernel.sh" ./AnyKernel3/
 
-    if [[ $overwrite == true ]]; then
-        rm AnyKernel3.zip
-    fi
+    [[ $overwrite == true ]] && rm AnyKernel3.zip
 
     pushd AnyKernel3
     zip -rv ../AnyKernel3.zip *

@@ -2,7 +2,7 @@
 
 apply_manual_hooks_patches() {
     echo 'Patching manual hooks'
-    cp "$PATCHES_DIR/manual-hooks.patch" .
+    cp "$PATCHES_DIR/manual-hooks.patch" ./
     patch -p1 < manual-hooks.patch
 }
 
@@ -12,13 +12,8 @@ add_sukisu_configs() {
     echo 'CONFIG_KSU=y' >> $config_file
     echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
-    if [[ $SUKISU_DEBUG == true ]]; then
-        echo 'CONFIG_KSU_DEBUG=y' >> $config_file
-    fi
-
-    if [[ $SUKISU_KPM == true ]]; then
-        echo 'CONFIG_KPM=y' >> $config_file
-    fi
+    [[ $SUKISU_DEBUG == true ]] && echo 'CONFIG_KSU_DEBUG=y' >> $config_file
+    [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     if [[ $SUSFS_ENABLED == true ]]; then
         echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
@@ -64,8 +59,8 @@ apply_sukisu_patches() {
         cp "$PATCHES_DIR/set_memory.h" ./include/linux
     fi
 
-    cp "$PATCHES_DIR/modules-fix.patch" .
-    cp "$PATCHES_DIR/path_umount.patch" .
+    cp "$PATCHES_DIR/modules-fix.patch" /.
+    cp "$PATCHES_DIR/path_umount.patch" /.
 
     patch -p1 < modules-fix.patch
     patch -p1 < path_umount.patch

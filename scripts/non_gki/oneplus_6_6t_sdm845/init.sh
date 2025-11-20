@@ -141,45 +141,23 @@ parse_args() {
 
 write_config() {
     echo -n > repo.conf
-    if [[ $KERNEL_REPO ]]; then
-        echo "KERNEL_REPO='$KERNEL_REPO'" >> repo.conf
-    fi
-
-    if [[ $KERNEL_BRANCH ]]; then
-        echo "KERNEL_BRANCH='$KERNEL_BRANCH'" >> repo.conf
-    fi
+    [[ $KERNEL_REPO ]] && echo "KERNEL_REPO='$KERNEL_REPO'" >> repo.conf
+    [[ $KERNEL_BRANCH ]] && echo "KERNEL_BRANCH='$KERNEL_BRANCH'" >> repo.conf
 
     echo "KERNEL_SUFFIX='$KERNEL_SUFFIX'" >> repo.conf
 
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        if [[ $SUKISU_DEBUG == true ]]; then
-            echo "SUKISU_DEBUG=$SUKISU_DEBUG" >> repo.conf
-        fi
-
-        if [[ $SUKISU_KPM ]]; then
-            echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
-        fi
-
-        if [[ $SUKISU_VER ]]; then
-            echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
-        fi
-
-        if [[ $SUSFS_ENABLED ]]; then
-            echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
-        fi
+        [[ $SUKISU_DEBUG == true ]] && echo "SUKISU_DEBUG=$SUKISU_DEBUG" >> repo.conf
+        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
+        [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
     fi
 }
 
 check_args() {
     local result=0
-
-    if [[ ! $SUSFS_ENABLED || $SUSFS_ENABLED == true ]]; then
-        local susfs_status=true
-    else
-        local susfs_status=false
-    fi
 
     if [[ $SUKISU != true ]]; then
         if [[ $SUKISU_KPM ]]; then
@@ -198,9 +176,7 @@ check_args() {
         fi
     fi
 
-    if [[ $result -ne 0 ]]; then
-        echo "Try '$0 --help' for more information."
-    fi
+    [[ $result -ne 0 ]] && echo "Try '$0 --help' for more information."
 
     return $result
 }
@@ -208,13 +184,8 @@ check_args() {
 main() {
     parse_args $@
 
-    if ! check_args; then
-        exit 1
-    fi
-
-    if ! check_environment; then
-        exit 1
-    fi
+    check_args || exit 1
+    check_environment || exit 1
 
     local script_dir=$(dirname $(realpath "$0"))
     script_dir=$(readlink -f "$script_dir/../..")

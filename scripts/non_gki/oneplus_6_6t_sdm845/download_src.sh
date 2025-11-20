@@ -58,9 +58,7 @@ main() {
     if [[ $SUKISU == true ]]; then
         init_sukisu
 
-        if [[ $SUSFS_ENABLED == true ]]; then
-            init_susfs
-        fi
+        [[ $SUSFS_ENABLED == true ]] && init_susfs
     fi
 
     popd
