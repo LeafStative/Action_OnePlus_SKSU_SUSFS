@@ -59,8 +59,8 @@ apply_sukisu_patches() {
         cp "$PATCHES_DIR/set_memory.h" ./include/linux
     fi
 
-    cp "$PATCHES_DIR/modules-fix.patch" /.
-    cp "$PATCHES_DIR/path_umount.patch" /.
+    cp "$PATCHES_DIR/modules-fix.patch" ./
+    cp "$PATCHES_DIR/path_umount.patch" ./
 
     patch -p1 < modules-fix.patch
     patch -p1 < path_umount.patch
