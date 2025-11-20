@@ -21,7 +21,7 @@ init_repo() {
 }
 
 init_sukisu() {
-    local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-' )
+    local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-s nongki' )
 
     set -e
     pushd android_kernel
@@ -39,7 +39,6 @@ init_sukisu() {
 
 init_susfs() {
     set -e
-    git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10
     git clone https://github.com/SukiSU-Ultra/SukiSU_patch
     set +e
 }

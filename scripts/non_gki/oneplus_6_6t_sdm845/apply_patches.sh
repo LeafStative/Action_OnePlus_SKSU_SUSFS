@@ -20,17 +20,13 @@ add_sukisu_configs() {
         echo 'CONFIG_KPM=y' >> $config_file
     fi
 
-    echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
-
     if [[ $SUSFS_ENABLED == true ]]; then
+        echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+
         echo 'CONFIG_KSU_SUSFS=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_KSTAT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n' >> $config_file
         echo 'CONFIG_KSU_SUSFS_TRY_UMOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SPOOF_UNAME=y' >> $config_file
@@ -39,6 +35,8 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_SU=n' >> $config_file
+    else
+        echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
     fi
 }
 
@@ -50,16 +48,11 @@ configure_kernel_name() {
 }
 
 apply_susfs_patches() {
-    cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
-    cp ../susfs4ksu/kernel_patches/fs/* ./fs
-    cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux
-    cp "$PATCHES_DIR/susfs-fix.patch" .
-
-    cp ../SukiSU_patch/69_hide_stuff.patch .
+    cp "$PATCHES_DIR/susfs.patch" ./
+    cp ../SukiSU_patch/69_hide_stuff.patch ./
 
     echo 'Patching SUSFS'
-    git apply --reject 50_add_susfs_in_gki-android12-5.10.patch || true
-    patch -p1 < susfs-fix.patch
+    patch -p1 < susfs.patch
 
     echo 'Patching 69_hide_stuff.patch'
     patch -p1 -F 3 < 69_hide_stuff.patch
@@ -96,11 +89,8 @@ main() {
     if [[ $SUKISU == true ]]; then
         apply_sukisu_patches
 
-        if [[ $SUSFS_ENABLED == true ]]; then
-            apply_susfs_patches
-        fi
+        [[ $SUSFS_ENABLED == true ]] && apply_susfs_patches || apply_manual_hooks_patches
 
-        apply_manual_hooks_patches
         add_sukisu_configs
     fi
 
