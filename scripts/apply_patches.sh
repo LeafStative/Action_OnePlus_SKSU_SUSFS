@@ -3,13 +3,13 @@
 apply_zram_patches() {
     local kernel_version="${GKI_ABI:10}"
 
-    cp -r ../SukiSU_patch/other/zram/lz4k/include/linux/* ./common/include/linux
-    cp -r ../SukiSU_patch/other/zram/lz4k/lib/* ./common/lib
-    cp -r ../SukiSU_patch/other/zram/lz4k/crypto/* ./common/crypto
-    cp -r ../SukiSU_patch/other/zram/lz4k_oplus ./common/lib
-    cp ../SukiSU_patch/other/zram/zram_patch/$kernel_version/lz4kd.patch ./common
+    cp -r ./SukiSU_patch/other/zram/lz4k/include/linux/* ./kernel_platform/common/include/linux
+    cp -r ./SukiSU_patch/other/zram/lz4k/lib/* ./kernel_platform/common/lib
+    cp -r ./SukiSU_patch/other/zram/lz4k/crypto/* ./kernel_platform/common/crypto
+    cp -r ./SukiSU_patch/other/zram/lz4k_oplus ./kernel_platform/common/lib
+    cp ./SukiSU_patch/other/zram/zram_patch/$kernel_version/lz4kd.patch ./kernel_platform/common
 
-    pushd ./common
+    pushd ./kernel_platform/common
 
     echo 'Patching ZRAM'
     patch -p1 -F 3 < lz4kd.patch || true
@@ -28,9 +28,11 @@ apply_manual_hooks_patches() {
 }
 
 add_lz4kd_configs() {
+    pushd ./kernel_platform/common
+
     local android_version="${GKI_ABI:0:9}"
     local kernel_version="${GKI_ABI:10}"
-    local config_file=$1
+    local config_file='./arch/arm64/configs/gki_defconfig'
 
     if [[ $kernel_version == '5.10' ]]; then
         echo 'CONFIG_ZSMALLOC=y' >> $config_file
@@ -77,6 +79,8 @@ add_lz4kd_configs() {
         echo 'CONFIG_CRYPTO_842=y' >> $config_file
         echo 'CONFIG_ZRAM_WRITEBACK=y' >> $config_file
     fi
+
+    popd
 }
 
 add_sukisu_configs() {
@@ -115,8 +119,6 @@ add_sukisu_configs() {
 
     sed -i 's/check_defconfig//' ./build.config.gki
 
-    [[ $ZRAM_ENABLED == true ]] && add_lz4kd_configs $config_file
-
     popd
 }
 
@@ -148,9 +150,6 @@ apply_susfs_patches() {
     patch -p1 -F 3 < 69_hide_stuff.patch
 
     popd
-
-    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches
-
     popd
 }
 
@@ -175,6 +174,8 @@ main() {
     pushd workspace
 
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
+
+    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches && add_lz4kd_configs
 
     if [[ $SUKISU == true ]]; then
         case $SUKISU_HOOK in
