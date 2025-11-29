@@ -163,7 +163,6 @@ main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
 
-    SUKISU_KPM=true
     SUKISU_HOOK=susfs
     source repo.conf
 

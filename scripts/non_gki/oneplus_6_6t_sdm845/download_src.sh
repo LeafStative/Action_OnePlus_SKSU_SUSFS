@@ -24,6 +24,9 @@ init_sukisu() {
     local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-s nongki' )
 
     set -e
+
+    [[ $SUSFS_ENABLED == true || $SUKISU_KPM == true ]] && git clone https://github.com/SukiSU-Ultra/SukiSU_patch
+
     pushd android_kernel
 
     curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash $init_args
@@ -34,12 +37,6 @@ init_sukisu() {
     fi
 
     popd
-    set +e
-}
-
-init_susfs() {
-    set -e
-    git clone https://github.com/SukiSU-Ultra/SukiSU_patch
     set +e
 }
 
@@ -62,12 +59,7 @@ main() {
     init_repo
 
     [[ $BASEBAND_GUARD_ENABLED == true ]] && init_baseband_guard
-
-    if [[ $SUKISU == true ]]; then
-        init_sukisu
-
-        [[ $SUSFS_ENABLED == true ]] && init_susfs
-    fi
+    [[ $SUKISU == true ]] && init_sukisu
 
     popd
 }

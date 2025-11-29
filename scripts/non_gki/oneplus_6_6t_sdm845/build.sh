@@ -19,7 +19,6 @@ patch_kpm() {
 }
 
 main() {
-    SUKISU_KPM=true
     source repo.conf
 
     which python > /dev/null 2>&1
@@ -57,7 +56,7 @@ main() {
         LLVM_AR=llvm-ar \
         LLVM_DIS=llvm-dis \
         enchilada_defconfig
-    
+
     make \
         O=../out \
         LLVM=1 \

@@ -18,7 +18,6 @@ patch_kpm() {
 }
 
 main() {
-    SUKISU_KPM=true
     source repo.conf
 
     which python > /dev/null 2>&1

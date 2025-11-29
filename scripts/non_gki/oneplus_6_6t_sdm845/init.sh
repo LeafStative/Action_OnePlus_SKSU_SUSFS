@@ -13,7 +13,7 @@ USAGE: $0 [OPTION ...]
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -d, --sukisu-debug           (bool) Enable SukiSU-Ultra debug mode (default false).
-      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
+      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default false).
       -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
       -s, --susfs                  (bool) Enable susfs integration (default true).
 EOF
@@ -55,8 +55,8 @@ check_environment() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:S:BkdK::v:s:: \
-    -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-kpm::,sukisu-version:,susfs:: \
+    local args=$(getopt -o hr:b:S:BkdKv:s:: \
+    -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-kpm,sukisu-version:,susfs:: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -96,20 +96,8 @@ parse_args() {
                 shift 1
                 ;;
             -K|--sukisu-kpm)
-                case "$2" in
-                    ''|true)
-                        SUKISU_KPM=true
-                        shift 2
-                        ;;
-                    false)
-                        SUKISU_KPM=false
-                        shift 2
-                        ;;
-                    *)
-                        echo "Invalid susfs status '$2'."
-                        exit 1
-                        ;;
-                esac
+                SUKISU_KPM=true
+                shift 1
                 ;;
             -v|--sukisu-version)
                 SUKISU_VER="$2"
@@ -157,7 +145,7 @@ write_config() {
         echo -e '\nSUKISU=true' >> repo.conf
 
         [[ $SUKISU_DEBUG == true ]] && echo "SUKISU_DEBUG=$SUKISU_DEBUG" >> repo.conf
-        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_KPM == true ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
     fi

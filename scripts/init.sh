@@ -16,7 +16,7 @@ USAGE: $0 [OPTION ...]
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
-      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
+      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default false).
       -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
       -H, --sukisu-hook <hook>     Sukisu-Ultra hook type selection, available options:
                                      susfs (default)
@@ -72,8 +72,8 @@ check_sukisu_hook() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:s:c:zSBkK::v:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,baseband-guard,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zSBkKv:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,baseband-guard,sukisu,sukisu-kpm,sukisu-version:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -125,20 +125,8 @@ parse_args() {
                 shift 1
                 ;;
             -K|--sukisu-kpm)
-                case "$2" in
-                    ''|true)
-                        SUKISU_KPM=true
-                        shift 2
-                        ;;
-                    false)
-                        SUKISU_KPM=false
-                        shift 2
-                        ;;
-                    *)
-                        echo "Invalid KPM value '$2'."
-                        exit 1
-                        ;;
-                esac
+                SUKISU_KPM=true
+                shift 1
                 ;;
             -v|--sukisu-version)
                 SUKISU_VER="$2"
@@ -180,7 +168,7 @@ EOF
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_KPM == true ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUKISU_HOOK ]] && echo "SUKISU_HOOK=$SUKISU_HOOK" >> repo.conf
     fi

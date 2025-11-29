@@ -71,7 +71,6 @@ add_baseband_guard_configs() {
 
 main() {
     SUSFS_ENABLED=true
-    SUKISU_KPM=true
     source repo.conf
 
     PATCHES_DIR=$(realpath patches/oneplus_6_6t_sdm845)
