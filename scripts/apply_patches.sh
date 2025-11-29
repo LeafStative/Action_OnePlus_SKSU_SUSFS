@@ -103,11 +103,7 @@ add_sukisu_configs() {
             echo 'CONFIG_KSU_SUSFS=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SUS_MOUNT=y' >> $config_file
-            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y' >> $config_file
-            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SUS_KSTAT=y' >> $config_file
-            echo 'CONFIG_KSU_SUSFS_TRY_UMOUNT=y' >> $config_file
-            echo 'CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SPOOF_UNAME=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_ENABLE_LOG=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y' >> $config_file
