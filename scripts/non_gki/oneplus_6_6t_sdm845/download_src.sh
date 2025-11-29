@@ -42,7 +42,11 @@ init_sukisu() {
 
 init_baseband_guard() {
     set -e
+    pushd android_kernel
+
     curl -LSs 'https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh' | bash
+
+    popd
     set +e
 }
 

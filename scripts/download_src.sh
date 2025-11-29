@@ -64,7 +64,11 @@ init_susfs() {
 
 init_baseband_guard() {
     set -e
+    pushd ./kernel_platform/common
+
     curl -LSs 'https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh' | bash
+
+    popd
     set +e
 }
 
