@@ -4,7 +4,7 @@ patch_kpm() {
     echo 'KernelPatch module enabled, patching kernel image'
 
     local image_dir=$(dirname $1)
-    cp ../SukiSU_patch/kpm/patch_linux "$image_dir"
+    cp ./SukiSU_patch/kpm/patch_linux "$image_dir"
     pushd $image_dir
 
     chmod a+x ./patch_linux
@@ -47,9 +47,10 @@ main() {
         exit 1
     fi
 
-    pushd workspace/android_kernel
+    pushd workspace
+    pushd android_kernel
     make \
-        O=out \
+        O=../out \
         clean \
         mrproper \
         LLVM=1 \
@@ -58,13 +59,13 @@ main() {
         enchilada_defconfig
     
     make \
-        O=out \
+        O=../out \
         LLVM=1 \
         LLVM_AR=llvm-ar \
         LLVM_DIS=llvm-dis \
         -j$(nproc --all)
 
-    local image_path='out/arch/arm64/boot/Image'
+    local image_path=$(realpath -m '../out/arch/arm64/boot/Image')
     if [[ ! -f $image_path ]]; then
         echo 'Build failed!'
         exit 1
@@ -73,6 +74,8 @@ main() {
     local kernel_version=$(strings $image_path | grep -oP '(?<=Linux version )\d\S+')
 
     echo "Kernel version: $kernel_version"
+
+    popd
 
     [[ $SUKISU_KPM == true ]] && patch_kpm $image_path
 

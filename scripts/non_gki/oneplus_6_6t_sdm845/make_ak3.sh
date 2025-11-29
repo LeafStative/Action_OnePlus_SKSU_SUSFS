@@ -15,7 +15,7 @@ main() {
     fi
     pushd workspace
 
-    local image_path='android_kernel/out/arch/arm64/boot/Image'
+    local image_path='out/arch/arm64/boot/Image'
     if [[ ! -f $image_path ]]; then
         echo 'Kernel image not found! Please build the kernel first.'
         exit 1
