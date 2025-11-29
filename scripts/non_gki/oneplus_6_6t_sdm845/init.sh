@@ -10,6 +10,7 @@ USAGE: $0 [OPTION ...]
       -r, --repo <owner/repo>      Kernel source repo (default LineageOS/android_kernel_oneplus_sdm845).
       -b, --branch <branch>        Kernel source repo branch (optional).
       -S, --kernel-suffix <suffix> Custom Kernel suffix (optional).
+      -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -d, --sukisu-debug           (bool) Enable SukiSU-Ultra debug mode (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
@@ -54,8 +55,8 @@ check_environment() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:S:kdK::v:s:: \
-    -l help,repo:,branch:,kernel-suffix:,sukisu,sukisu-debug,sukisu-kpm::,sukisu-version:,susfs:: \
+    local args=$(getopt -o hr:b:S:BkdK::v:s:: \
+    -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-kpm::,sukisu-version:,susfs:: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -81,6 +82,10 @@ parse_args() {
             -S|--kernel-suffix)
                 KERNEL_SUFFIX="$2"
                 shift 2
+                ;;
+            -B|--baseband-guard)
+                BASEBAND_GUARD_ENABLED=true
+                shift 1
                 ;;
             -k|--sukisu)
                 SUKISU=true
@@ -145,6 +150,8 @@ write_config() {
     [[ $KERNEL_BRANCH ]] && echo "KERNEL_BRANCH='$KERNEL_BRANCH'" >> repo.conf
 
     echo "KERNEL_SUFFIX='$KERNEL_SUFFIX'" >> repo.conf
+
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && echo -e '\nBASEBAND_GUARD_ENABLED=true' >> repo.conf
 
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf

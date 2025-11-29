@@ -43,6 +43,12 @@ init_susfs() {
     set +e
 }
 
+init_baseband_guard() {
+    set -e
+    curl -LSs 'https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh' | bash
+    set +e
+}
+
 main() {
     KERNEL_REPO='LineageOS/android_kernel_oneplus_sdm845'
     SUSFS_ENABLED=true
@@ -54,6 +60,8 @@ main() {
     pushd workspace
 
     init_repo
+
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && init_baseband_guard
 
     if [[ $SUKISU == true ]]; then
         init_sukisu

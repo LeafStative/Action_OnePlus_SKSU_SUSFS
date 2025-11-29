@@ -64,6 +64,11 @@ apply_sukisu_patches() {
     patch -p1 < path_umount.patch
 }
 
+add_baseband_guard_configs() {
+    local config_file='./arch/arm64/configs/enchilada_defconfig'
+    echo 'CONFIG_BBG=y' >> $config_file
+}
+
 main() {
     SUSFS_ENABLED=true
     SUKISU_KPM=true
@@ -86,6 +91,8 @@ main() {
 
         add_sukisu_configs
     fi
+
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && add_baseband_guard_configs
 
     configure_kernel_name
 

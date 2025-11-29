@@ -22,6 +22,11 @@ on:
         description: 'CPU codename'
         required: true
         default: 'waipio'
+      baseband_guard_enable:
+        description: "Enable Baseband-guard"
+        required: true
+        type: boolean
+        default: true
       sukisu_enable:
         description: "Enable SukiSU-Ultra"
         required: true
@@ -82,6 +87,11 @@ jobs:
 
           if [[ '${{ inputs.repo }}' ]]; then
             args+=" -r '${{ inputs.repo }}'"
+          fi
+
+          if [[ '${{ inputs.baseband_guard_enable }}' == true ]]; then
+            args+=' -B'
+            output_string+='_BBG'
           fi
 
           if [[ '${{ inputs.sukisu_enable }}' == true ]]; then

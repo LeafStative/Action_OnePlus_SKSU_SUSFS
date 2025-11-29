@@ -14,6 +14,7 @@ USAGE: $0 [OPTION ...]
       -c, --codename <codename>    CPU code name.
       -z, --zram                   (bool) Integrate ZRAM patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
+      -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default true).
       -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
@@ -71,8 +72,8 @@ check_sukisu_hook() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:s:c:zSkK::v:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zSBkK::v:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,baseband-guard,sukisu,sukisu-kpm::,sukisu-version:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -113,6 +114,10 @@ parse_args() {
                 ;;
             -S|--sched)
                 SCHED_ENABLED=true
+                shift 1
+                ;;
+            -B|--baseband-guard)
+                BASEBAND_GUARD_ENABLED=true
                 shift 1
                 ;;
             -k|--sukisu)
@@ -165,10 +170,12 @@ REPO_BRANCH='$REPO_BRANCH'
 MANIFEST_FILE='$MANIFEST_FILE'
 KERNEL_SUFFIX='$KERNEL_SUFFIX'
 CPU_CODENAME=$CPU_CODENAME
+
 EOF
 
     [[ $ZRAM_ENABLED == true ]] && echo 'ZRAM_ENABLED=true' >> repo.conf
     [[ $SCHED_ENABLED == true ]] && echo 'SCHED_ENABLED=true' >> repo.conf
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && echo 'BASEBAND_GUARD_ENABLED=true' >> repo.conf
 
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf

@@ -62,6 +62,12 @@ init_susfs() {
     set +e
 }
 
+init_baseband_guard() {
+    set -e
+    curl -LSs 'https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh' | bash
+    set +e
+}
+
 main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
@@ -76,6 +82,7 @@ main() {
     init_repo
 
     [[ $SCHED_ENABLED == true ]] && init_sched
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && init_baseband_guard
 
     if [[ $SUKISU == true ]]; then
         init_sukisu

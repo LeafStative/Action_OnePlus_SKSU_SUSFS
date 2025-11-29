@@ -154,6 +154,11 @@ apply_susfs_patches() {
     popd
 }
 
+add_baseband_guard_configs() {
+    local config_file='./kernel_platform/common/arch/arm64/configs/gki_defconfig'
+    echo 'CONFIG_BBG=y' >> $config_file
+}
+
 main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
@@ -186,6 +191,7 @@ main() {
     fi
 
     [[ $SCHED_ENABLED == true ]] && add_sched
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && add_baseband_guard_configs
 
     configure_kernel_name
 

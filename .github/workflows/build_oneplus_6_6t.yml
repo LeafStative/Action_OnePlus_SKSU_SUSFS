@@ -14,6 +14,11 @@ on:
         description: 'Kernel version suffix'
         required: false
         default: '-hath'
+      baseband_guard_enable:
+        description: "Enable Baseband-guard"
+        required: true
+        type: boolean
+        default: true
       sukisu_enable:
         description: "Enable SukiSU-Ultra"
         required: true
@@ -83,6 +88,11 @@ jobs:
 
           if [[ '${{ inputs.kernel_suffix }}' ]]; then
             args+=" -S '${{ inputs.kernel_suffix }}'"
+          fi
+
+          if [[ '${{ inputs.baseband_guard_enable }}' == true ]]; then
+            args+=' -B'
+            output_string+='_BBG'
           fi
 
           if [[ '${{ inputs.sukisu_enable }}' == true ]]; then
