@@ -1336,7 +1336,7 @@ index 742ec241d106..b9dba294cb5b 100644
  	return 0;
  }
 diff --git a/fs/proc/fd.c b/fs/proc/fd.c
-index 4274f83bf100..f90b0adff110 100644
+index 4274f83bf100..5297bfa641e0 100644
 --- a/fs/proc/fd.c
 +++ b/fs/proc/fd.c
 @@ -11,6 +11,9 @@
@@ -1359,7 +1359,7 @@ index 4274f83bf100..f90b0adff110 100644
  
  	task = get_proc_task(m->private);
  	if (!task)
-@@ -52,9 +58,21 @@ static int seq_show(struct seq_file *m, void *v)
+@@ -52,9 +58,24 @@ static int seq_show(struct seq_file *m, void *v)
  	if (ret)
  		return ret;
  
@@ -1368,11 +1368,14 @@ index 4274f83bf100..f90b0adff110 100644
 +	if (likely(susfs_is_current_proc_umounted()) &&
 +				mnt->mnt_id >= DEFAULT_KSU_MNT_ID)
 +	{
++		// - We have to iterate the mnt->mnt_parent until the mnt_id is not sus,
++		//   doing real_mount(path.mnt)->mnt_id is wrong since this will retrieve
++		//   the mnt_id of the umounted path.
 +		for (; mnt->mnt_id >= DEFAULT_KSU_MNT_ID; mnt = mnt->mnt_parent) { }
 +	}
 +	seq_printf(m, "pos:\t%lli\nflags:\t0%o\nmnt_id:\t%i\n",
-+		   (long long)file->f_pos, f_flags,
-+		   mnt->mnt_id);
++			(long long)file->f_pos, f_flags,
++			mnt->mnt_id);
 +#else
  	seq_printf(m, "pos:\t%lli\nflags:\t0%o\nmnt_id:\t%i\n",
  		   (long long)file->f_pos, f_flags,
