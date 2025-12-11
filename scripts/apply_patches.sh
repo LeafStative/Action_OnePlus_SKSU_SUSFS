@@ -98,11 +98,11 @@ add_sukisu_configs() {
             echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
             ;;
         kprobes)
-            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+            echo 'CONFIG_KSU_SYACALL_HOOK=y' >> $config_file
             echo 'CONFIG_KPROBES=y' >> $config_file
             ;;
         susfs)
-            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+            echo 'CONFIG_KSU_NONE_HOOK=y' >> $config_file
 
             echo 'CONFIG_KSU_SUSFS=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file

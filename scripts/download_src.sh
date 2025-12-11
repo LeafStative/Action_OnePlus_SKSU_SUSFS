@@ -32,12 +32,10 @@ init_sched() {
 }
 
 init_sukisu() {
-    local init_args=$( [[ $SUKISU_HOOK == 'susfs' ]] && echo '-s susfs-main' || echo '-' )
-
     set -e
     pushd ./kernel_platform
 
-    curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash $init_args
+    curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
 
     pushd ./KernelSU
 

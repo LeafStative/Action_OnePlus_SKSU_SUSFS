@@ -16,7 +16,7 @@ add_sukisu_configs() {
     [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     if [[ $SUSFS_ENABLED == true ]]; then
-        echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
+        echo 'CONFIG_KSU_NONE_HOOK=y' >> $config_file
 
         echo 'CONFIG_KSU_SUSFS=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file
@@ -27,7 +27,7 @@ add_sukisu_configs() {
         echo 'CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y' >> $config_file
         echo 'CONFIG_KSU_SUSFS_OPEN_REDIRECT=y' >> $config_file
-        echo 'CONFIG_KSU_SUSFS_SUS_SU=n' >> $config_file
+        echo 'CONFIG_KSU_SUSFS_SUS_MAP=y' >> $config_file
     else
         echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
     fi

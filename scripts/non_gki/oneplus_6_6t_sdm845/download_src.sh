@@ -21,15 +21,13 @@ init_repo() {
 }
 
 init_sukisu() {
-    local init_args=$( [[ $SUSFS_ENABLED == true ]] && echo '-s susfs-main' || echo '-s nongki' )
-
     set -e
 
     [[ $SUSFS_ENABLED == true || $SUKISU_KPM == true ]] && git clone https://github.com/SukiSU-Ultra/SukiSU_patch
 
     pushd android_kernel
 
-    curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash $init_args
+    curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
 
     if [[ $SUKISU_VER ]]; then
         sed -i 's/DKSU_VERSION_FULL=\\"\$(KSU_VERSION_FULL)\\"/DKSU_VERSION_FULL=\\"'"$SUKISU_VER"'\\"/' kernel/Makefile
