@@ -154,7 +154,7 @@ apply_susfs_patches() {
 }
 
 add_baseband_guard_configs() {
-    sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' \
+    sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' \
         ./kernel_platform/common/security/Kconfig
 
     local config_file='./kernel_platform/common/arch/arm64/configs/gki_defconfig'
