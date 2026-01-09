@@ -55,7 +55,7 @@ main() {
 
     echo "Kernel version: $kernel_version"
 
-    [[ $SUKISU_KPM == true ]] && patch_kpm
+    [[ $SUKISU_KPM == 'full' ]] && patch_kpm
 
     popd
 

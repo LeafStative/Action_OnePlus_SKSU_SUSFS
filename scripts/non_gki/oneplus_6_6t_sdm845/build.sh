@@ -76,7 +76,7 @@ main() {
 
     popd
 
-    [[ $SUKISU_KPM == true ]] && patch_kpm $image_path
+    [[ $SUKISU_KPM == 'full' ]] && patch_kpm $image_path
 
     popd
 

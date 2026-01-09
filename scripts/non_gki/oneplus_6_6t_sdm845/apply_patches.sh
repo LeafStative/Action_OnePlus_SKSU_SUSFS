@@ -13,7 +13,7 @@ add_sukisu_configs() {
     echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
     [[ $SUKISU_DEBUG == true ]] && echo 'CONFIG_KSU_DEBUG=y' >> $config_file
-    [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
+    [[ $SUKISU_KPM == 'full' || $SUKISU_KPM == 'compile-only' ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     if [[ $SUSFS_ENABLED == true ]]; then
         echo 'CONFIG_KSU_NONE_HOOK=y' >> $config_file
@@ -52,7 +52,7 @@ apply_susfs_patches() {
 }
 
 apply_sukisu_patches() {
-    if [[ $SUKISU_KPM == true ]]; then
+    if [[ $SUKISU_KPM == 'full' || $SUKISU_KPM == 'compile-only' ]]; then
         echo 'Patching for KPM support'
         cp "$PATCHES_DIR/set_memory.h" ./include/linux
     fi

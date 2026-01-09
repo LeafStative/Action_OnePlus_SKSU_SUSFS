@@ -32,11 +32,15 @@ on:
         required: true
         type: boolean
         default: true
-      kpm_enable:
-        description: "Enable KernelPatch module"
+      kpm:
+        description: "KernelPatch module support"
         required: true
-        type: boolean
-        default: true
+        type: choice
+        default: full
+        options:
+          - full
+          - compile-only
+          - none
       sukisu_hook:
         description: 'SUSFS / Hook type selection'
         required: true
@@ -98,10 +102,16 @@ jobs:
             args+=' -k'
             output_string+='_SKSU'
 
-            if [[ '${{ inputs.kpm_enable }}' == true ]]; then
-              args+=' -K'
-              output_string+='_KPM'
-            fi
+            case '${{ inputs.kpm }}' in
+              full)
+                args+=' -K full'
+                output_string+='_KPM'
+                ;;
+              compile-only)
+                args+=' -K compile-only'
+                output_string+='_KPMCO'
+                ;;
+            esac
 
             case '${{ inputs.sukisu_hook }}' in
               susfs)

@@ -23,7 +23,7 @@ init_repo() {
 init_sukisu() {
     set -e
 
-    [[ $SUSFS_ENABLED == true || $SUKISU_KPM == true ]] && git clone https://github.com/SukiSU-Ultra/SukiSU_patch
+    [[ $SUSFS_ENABLED == true || $SUKISU_KPM == 'full' ]] && git clone https://github.com/SukiSU-Ultra/SukiSU_patch
 
     pushd android_kernel
 

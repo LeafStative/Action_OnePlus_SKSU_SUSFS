@@ -16,8 +16,11 @@ USAGE: $0 [OPTION ...]
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
-      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default false).
       -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
+      -K, --sukisu-kpm <value>     KernelPatch module support.
+                                     full
+                                     compile-only
+                                     none (default)
       -H, --sukisu-hook <hook>     Sukisu-Ultra hook type selection, available options:
                                      susfs (default)
                                      manual
@@ -60,6 +63,17 @@ check_environment() {
     return 0
 }
 
+check_kpm_support() {
+    case "$1" in
+        full|compile-only|none)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 check_sukisu_hook() {
     case "$1" in
         susfs|manual|kprobes)
@@ -72,8 +86,8 @@ check_sukisu_hook() {
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:s:c:zSBkKv:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,baseband-guard,sukisu,sukisu-kpm,sukisu-version:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zSBkv:K:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,sched,baseband-guard,sukisu,sukisu-version:,sukisu-kpm:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -124,12 +138,12 @@ parse_args() {
                 SUKISU=true
                 shift 1
                 ;;
-            -K|--sukisu-kpm)
-                SUKISU_KPM=true
-                shift 1
-                ;;
             -v|--sukisu-version)
                 SUKISU_VER="$2"
+                shift 2
+                ;;
+            -K|--sukisu-kpm)
+                SUKISU_KPM="$2"
                 shift 2
                 ;;
             -H|--sukisu-hook)
@@ -168,7 +182,7 @@ EOF
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        [[ $SUKISU_KPM == true ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUKISU_HOOK ]] && echo "SUKISU_HOOK=$SUKISU_HOOK" >> repo.conf
     fi
@@ -212,9 +226,16 @@ check_args() {
             echo "SukiSU-Ultra hook type '$SUKISU_HOOK' specified, but SukiSU-Ultra not enabled, ignored."
             unset SUKISU_HOOK
         fi
-    elif [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
-        echo "Invalid SukiSU-Ultra hook type '$SUKISU_HOOK'."
-        result=1
+    else
+        if [[ $SUKISU_KPM ]] && ! check_kpm_support "$SUKISU_KPM"; then
+            echo "Invalid KernelPatch module support value '$SUKISU_KPM'."
+            result=1
+        fi
+
+        if [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
+            echo "Invalid SukiSU-Ultra hook type '$SUKISU_HOOK'."
+            result=1
+        fi
     fi
 
     [[ $result -ne 0 ]] && echo "Try '$0 --help' for more information."

@@ -29,11 +29,15 @@ on:
         required: true
         type: boolean
         default: false
-      kpm_enable:
-        description: "Enable KernelPatch module"
+      kpm:
+        description: "KernelPatch module support"
         required: true
-        type: boolean
-        default: true
+        type: choice
+        default: full
+        options:
+          - full
+          - compile-only
+          - none
       susfs_enabled:
         description: 'Enable susfs'
         required: true
@@ -104,10 +108,16 @@ jobs:
               output_string+='_DEBUG'
             fi
 
-            if [[ '${{ inputs.kpm_enable }}' == true ]]; then
-              args+=' -K'
-              output_string+='_KPM'
-            fi
+            case '${{ inputs.kpm }}' in
+              full)
+                args+=' -K full'
+                output_string+='_KPM'
+                ;;
+              compile-only)
+                args+=' -K compile-only'
+                output_string+='_KPMCO'
+                ;;
+            esac
 
             if [[ '${{ inputs.susfs_enabled }}' == true ]]; then
               output_string+='_SUSFS'

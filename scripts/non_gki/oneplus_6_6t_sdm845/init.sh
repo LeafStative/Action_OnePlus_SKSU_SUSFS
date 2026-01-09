@@ -13,8 +13,11 @@ USAGE: $0 [OPTION ...]
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
       -d, --sukisu-debug           (bool) Enable SukiSU-Ultra debug mode (default false).
-      -K, --sukisu-kpm             (bool) Enable KernelPatch module support (default false).
       -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
+      -K, --sukisu-kpm <value>     KernelPatch module support.
+                                     full
+                                     compile-only
+                                     none (default)
       -s, --susfs                  (bool) Enable susfs integration (default true).
 EOF
 }
@@ -54,9 +57,20 @@ check_environment() {
     return 0
 }
 
+check_kpm_support() {
+    case "$1" in
+        full|compile-only|none)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 parse_args() {
-    local args=$(getopt -o hr:b:S:BkdKv:s:: \
-    -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-kpm,sukisu-version:,susfs:: \
+    local args=$(getopt -o hr:b:S:Bkdv:K:s:: \
+    -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-version:,sukisu-kpm:,susfs:: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -95,12 +109,12 @@ parse_args() {
                 SUKISU_DEBUG=true
                 shift 1
                 ;;
-            -K|--sukisu-kpm)
-                SUKISU_KPM=true
-                shift 1
-                ;;
             -v|--sukisu-version)
                 SUKISU_VER="$2"
+                shift 2
+                ;;
+            -K|--sukisu-kpm)
+                SUKISU_KPM="$2"
                 shift 2
                 ;;
             -s|--susfs)
@@ -145,7 +159,7 @@ write_config() {
         echo -e '\nSUKISU=true' >> repo.conf
 
         [[ $SUKISU_DEBUG == true ]] && echo "SUKISU_DEBUG=$SUKISU_DEBUG" >> repo.conf
-        [[ $SUKISU_KPM == true ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
+        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUSFS_ENABLED ]] && echo "SUSFS_ENABLED=$SUSFS_ENABLED" >> repo.conf
     fi
@@ -169,6 +183,9 @@ check_args() {
             echo "SUSFS status manually specified, but SukiSU-Ultra not enabled, ignored."
             unset SUSFS_ENABLED
         fi
+    elif [[ $SUKISU_KPM ]] && ! check_kpm_support "$SUKISU_KPM"; then
+        echo "Invalid KernelPatch module support value '$SUKISU_KPM'."
+        result=1
     fi
 
     [[ $result -ne 0 ]] && echo "Try '$0 --help' for more information."

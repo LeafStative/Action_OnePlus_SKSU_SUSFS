@@ -91,7 +91,7 @@ add_sukisu_configs() {
     echo 'CONFIG_KSU=y' >> $config_file
     echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
-    [[ $SUKISU_KPM == true ]] && echo 'CONFIG_KPM=y' >> $config_file
+    [[ $SUKISU_KPM == 'full' || $SUKISU_KPM == 'compile-only' ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     case "$SUKISU_HOOK" in
         manual)
