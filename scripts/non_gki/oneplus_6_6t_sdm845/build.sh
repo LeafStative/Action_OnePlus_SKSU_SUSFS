@@ -1,24 +1,9 @@
 #!/usr/bin/bash
 
-patch_kpm() {
-    echo 'KernelPatch module enabled, patching kernel image'
-
-    local image_dir=$(dirname $1)
-    cp ./SukiSU_patch/kpm/patch_linux "$image_dir"
-    pushd $image_dir
-
-    chmod a+x ./patch_linux
-    ./patch_linux
-
-    mv Image Image.bak
-    mv oImage Image
-
-    echo 'Kernel image patched'
-
-    popd
-}
-
 main() {
+    local script_dir=$(realpath "$0/../../..")
+    source "$script_dir/lib/utils.sh"
+
     source repo.conf
 
     which python > /dev/null 2>&1
@@ -34,7 +19,6 @@ main() {
     PATH="$tools_path/linaro-gcc-4.9/aarch64-linux-gnu/bin:$PATH"
     PATH="$tools_path/linaro-gcc-4.9/arm-linux-gnueabi/bin:$PATH"
     export PATH="$tools_path/clang/host/linux-x86/clang-r428724/bin:$PATH"
-
     export ARCH=arm64
     export SUBARCH=ARM64
     export CLANG_TRIPLE=aarch64-linux-gnu-
@@ -71,12 +55,11 @@ main() {
     fi
 
     local kernel_version=$(strings $image_path | grep -oP '(?<=Linux version )\d\S+')
-
     echo "Kernel version: $kernel_version"
 
     popd
 
-    [[ $SUKISU_KPM == 'full' ]] && patch_kpm $image_path
+    [[ $SUKISU_KPM == 'full' ]] && patch_kpm ./SukiSU_patch/kpm/patch_linux "$(dirname "$image_path")"
 
     popd
 

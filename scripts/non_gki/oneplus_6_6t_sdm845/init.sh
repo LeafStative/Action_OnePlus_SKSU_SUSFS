@@ -22,52 +22,6 @@ USAGE: $0 [OPTION ...]
 EOF
 }
 
-check_environment() {
-    local result=0
-    if ! which python3 > /dev/null 2>&1; then
-        echo 'Python3 is not installed.'
-        result=1
-    fi
-
-    if ! which git > /dev/null 2>&1; then
-        echo 'Git is not installed.'
-        result=1
-    fi
-
-    if ! which curl > /dev/null 2>&1; then
-        echo 'Curl is not installed.'
-        result=1
-    fi
-
-    if ! which unzip > /dev/null 2>&1; then
-        echo 'Unzip is not installed.'
-        result=1
-    fi
-
-    if ! which jq > /dev/null 2>&1; then
-        echo 'Jq is not installed.'
-        result=1
-    fi
-
-    if [[ $result -ne 0 ]]; then
-        echo 'Please install the missing dependencies.'
-        return $result
-    fi
-
-    return 0
-}
-
-check_kpm_support() {
-    case "$1" in
-        full|compile-only|none)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
 parse_args() {
     local args=$(getopt -o hr:b:S:Bkdv:K:s:: \
     -l help,repo:,branch:,kernel-suffix:,baseband-guard,sukisu,sukisu-debug,sukisu-version:,sukisu-kpm:,susfs:: \
@@ -194,13 +148,14 @@ check_args() {
 }
 
 main() {
+    local script_dir=$(realpath "$0/../../..")
+    source "$script_dir/lib/utils.sh"
+
     parse_args $@
 
     check_args || exit 1
     check_environment || exit 1
 
-    local script_dir=$(dirname $(realpath "$0"))
-    script_dir=$(readlink -f "$script_dir/../..")
     if [[ ! -f 'tools/repo' || ! -f 'tools/magiskboot' ]]; then
         echo "Tools not found, downloading..."
 

@@ -1,23 +1,9 @@
 #!/usr/bin/bash
 
-patch_kpm() {
-    echo 'KernelPatch module enabled, patching kernel image'
-
-    cp ./SukiSU_patch/kpm/patch_linux ./out/dist
-    pushd out/dist
-
-    chmod a+x ./patch_linux
-    ./patch_linux
-
-    mv Image Image.bak
-    mv oImage Image
-
-    echo 'Kernel image patched'
-
-    popd
-}
-
 main() {
+    local script_dir=$(dirname $(realpath "$0"))
+    source "$script_dir/lib/utils.sh"
+
     source repo.conf
 
     which python > /dev/null 2>&1
@@ -52,10 +38,9 @@ main() {
     fi
 
     local kernel_version=$(strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+')
-
     echo "Kernel version: $kernel_version"
 
-    [[ $SUKISU_KPM == 'full' ]] && patch_kpm
+    [[ $SUKISU_KPM == 'full' ]] && patch_kpm ./SukiSU_patch/kpm/patch_linux ./out/dist
 
     popd
 
