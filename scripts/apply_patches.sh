@@ -11,6 +11,26 @@ defconfig_add_generic() {
     popd
 }
 
+patch_ogki() {
+    [[ $SCHED_ENABLED == true ]] && return 0
+
+    local version patchlevel
+    IFS='.' read version patchlevel <<< "$(extract_kernel_version ./kernel_platform/common 2)"
+    [[ $version < 6 && $patchlevel < 6 ]] && return 0
+
+    pushd ./kernel_platform/common
+
+    for path in ./kernel/sched/hmbird* ./vendor/oplus/kernel/cpu/sched_ext/hmbird*; do
+        [[ -d $path ]] && return 0
+    done
+
+    echo 'Patching OGKI'
+    sed -i '1iobj-y += hmbird_patch.o' drivers/Makefile
+    patch -p1 -F 3 < "$PATCHES_DIR/ogki_convert.patch" || true
+
+    popd
+}
+
 patch_zram() {
     cp -r ./SukiSU_patch/other/zram/lz4k/include/linux/* ./kernel_platform/common/include/linux
     cp -r ./SukiSU_patch/other/zram/lz4k/lib/* ./kernel_platform/common/lib
@@ -235,6 +255,7 @@ main() {
 
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
 
+    patch_ogki
     defconfig_add_generic
 
     [[ $ZRAM_ENABLED == true ]] && patch_zram

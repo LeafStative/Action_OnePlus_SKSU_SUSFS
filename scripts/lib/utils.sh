@@ -58,14 +58,21 @@ extract_gki_abi() {
 
 extract_kernel_version() {
     local makefile="$1/Makefile"
+    local field_count="$2"
 
+    [[ $field_count < 1 ]] && return 1
     [[ ! -f $makefile ]] && return 1
 
     local version=$(grep -m1 '^VERSION =' "$makefile" | cut -d= -f2 | tr -d ' ')
-    local patchlevel=$(grep -m1 '^PATCHLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
-    local sublevel=$(grep -m1 '^SUBLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
+    [[ !$version ]] && return 1
+    [[ $field_count == 1 ]] && echo "$version" && return 0
 
-    [[ ! $version || ! $patchlevel || ! $sublevel ]] && return 1
+    local patchlevel=$(grep -m1 '^PATCHLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
+    [[ ! $patchlevel ]] && return 1
+    [[ $field_count == 2 ]] && echo "${version}.${patchlevel}" && return 0
+
+    local sublevel=$(grep -m1 '^SUBLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
+    [[ ! $sublevel ]] && return 1
 
     echo "${version}.${patchlevel}.${sublevel}"
 }
