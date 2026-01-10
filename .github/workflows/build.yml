@@ -22,6 +22,11 @@ on:
         description: 'CPU codename'
         required: true
         default: 'waipio'
+      netfilter:
+        description: "Enable Netfilter features"
+        required: true
+        type: boolean
+        default: true
       baseband_guard_enable:
         description: "Enable Baseband-guard"
         required: true
@@ -91,6 +96,11 @@ jobs:
 
           if [[ '${{ inputs.repo }}' ]]; then
             args+=" -r '${{ inputs.repo }}'"
+          fi
+
+          if [[ '${{ inputs.netfilter }}' == true ]]; then
+            args+=' -n'
+            output_string+='_NF'
           fi
 
           if [[ '${{ inputs.baseband_guard_enable }}' == true ]]; then

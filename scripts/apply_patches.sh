@@ -174,12 +174,47 @@ add_baseband_guard_configs() {
     echo 'CONFIG_BBG=y' >> $config_file
 }
 
+patch_netfilter() {
+    pushd ./kernel_platform/common
+
+    # MediaTek SoCs does not need this patch.
+    patch -p1 -F 3 "${PATCHES_DIR}/ipv6-fix.patch"
+
+    echo "CONFIG_BPF_STREAM_PARSER=y" >> "$config_file"
+    echo "CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y" >> "$config_file"
+    echo "CONFIG_NETFILTER_XT_SET=y" >> "$config_file"
+    echo "CONFIG_IP_SET=y" >> "$config_file"
+    echo "CONFIG_IP_SET_MAX=65534" >> "$config_file"
+    echo "CONFIG_IP_SET_BITMAP_IP=y" >> "$config_file"
+    echo "CONFIG_IP_SET_BITMAP_IPMAC=y" >> "$config_file"
+    echo "CONFIG_IP_SET_BITMAP_PORT=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IP=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IPMARK=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IPPORT=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IPPORTIP=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IPPORTNET=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_IPMAC=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_MAC=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_NET=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_NETNET=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_NETPORT=y" >> "$config_file"
+    echo "CONFIG_IP_SET_HASH_NETIFACE=y" >> "$config_file"
+    echo "CONFIG_IP_SET_LIST_SET=y" >> "$config_file"
+    echo "CONFIG_IP6_NF_NAT=y" >> "$config_file"
+    echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> "$config_file"
+
+    popd
+}
+
 main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
 
     SUKISU_HOOK=susfs
     source repo.conf
+
+    PATCHES_DIR=$(realpath ./patches)
 
     if [[ ! -d workspace ]]; then
         echo 'No workspace found. Please run download_src.sh to download source code first.'
@@ -210,6 +245,7 @@ main() {
 
     [[ $SCHED_ENABLED == true ]] && add_sched
     [[ $BASEBAND_GUARD_ENABLED == true ]] && add_baseband_guard_configs
+    [[ $NETFILTER_ENABLED == true ]] && patch_netfilter
 
     configure_kernel_name
 
