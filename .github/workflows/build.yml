@@ -22,6 +22,11 @@ on:
         description: 'CPU codename'
         required: true
         default: 'waipio'
+      bbr_ecn:
+        description: "Enable BBR+ECN"
+        required: true
+        type: boolean
+        default: true
       netfilter:
         description: "Enable Netfilter features"
         required: true
@@ -96,6 +101,11 @@ jobs:
 
           if [[ '${{ inputs.repo }}' ]]; then
             args+=" -r '${{ inputs.repo }}'"
+          fi
+
+          if [[ '${{ inputs.bbr_ecn }}' == true ]]; then
+            args+=' -e'
+            output_string+='_BBR'
           fi
 
           if [[ '${{ inputs.netfilter }}' == true ]]; then

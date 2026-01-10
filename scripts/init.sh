@@ -13,6 +13,7 @@ USAGE: $0 [OPTION ...]
       -s, --kernel-suffix <suffix> Custom Kernel suffix.
       -c, --codename <codename>    CPU code name.
       -z, --zram                   (bool) Integrate ZRAM patches (default false).
+      -e, --bbr-ecn                (bool) Enable BBR+ECN (default false).
       -n, --netfilter              (bool) Integrate Netfilter patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
@@ -30,8 +31,8 @@ EOF
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:s:c:znSBkv:K:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,netfilter,sched,baseband-guard,sukisu,sukisu-version:,sukisu-kpm:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zenSBkv:K:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,bbr-ecn,netfilter,sched,baseband-guard,sukisu,sukisu-version:,sukisu-kpm:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -68,6 +69,10 @@ parse_args() {
                 ;;
             -z|--zram)
                 ZRAM_ENABLED=true
+                shift 1
+                ;;
+            -e|--bbr-ecn)
+                BBR_ECN_ENABLED=true
                 shift 1
                 ;;
             -n|--netfilter)
@@ -124,6 +129,7 @@ CPU_CODENAME=$CPU_CODENAME
 EOF
 
     [[ $ZRAM_ENABLED == true ]] && echo 'ZRAM_ENABLED=true' >> repo.conf
+    [[ $BBR_ECN_ENABLED == true ]] && echo 'BBR_ECN_ENABLED=true' >> repo.conf
     [[ $NETFILTER_ENABLED == true ]] && echo 'NETFILTER_ENABLED=true' >> repo.conf
     [[ $SCHED_ENABLED == true ]] && echo 'SCHED_ENABLED=true' >> repo.conf
     [[ $BASEBAND_GUARD_ENABLED == true ]] && echo 'BASEBAND_GUARD_ENABLED=true' >> repo.conf

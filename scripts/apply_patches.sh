@@ -31,6 +31,25 @@ patch_ogki() {
     popd
 }
 
+defconfig_add_bbr_ecn() {
+    pushd ./kernel_platform/common
+
+    local config_file='./arch/arm64/configs/gki_defconfig'
+
+    echo 'CONFIG_TCP_CONG_ADVANCED=y' >> "$config_file"
+    echo 'CONFIG_TCP_CONG_BBR=y' >> "$config_file"
+    echo 'CONFIG_NET_SCH_FQ=y' >> "$config_file"
+    echo 'CONFIG_TCP_CONG_BIC=n' >> "$config_file"
+    echo 'CONFIG_TCP_CONG_WESTWOOD=n' >> "$config_file"
+    echo 'CONFIG_TCP_CONG_HTCP=n' >> "$config_file"
+    echo 'CONFIG_IP_ECN=y' >> "$config_file"
+    echo 'CONFIG_TCP_ECN=y' >> "$config_file"
+    echo 'CONFIG_IPV6_ECN=y' >> "$config_file"
+    echo 'CONFIG_IP_NF_TARGET_ECN=y' >> "$config_file"
+
+    popd
+}
+
 patch_zram() {
     cp -r ./SukiSU_patch/other/zram/lz4k/include/linux/* ./kernel_platform/common/include/linux
     cp -r ./SukiSU_patch/other/zram/lz4k/lib/* ./kernel_platform/common/lib
@@ -209,29 +228,29 @@ patch_netfilter() {
     # MediaTek SoCs does not need this patch.
     patch -p1 -F 3 "${PATCHES_DIR}/ipv6-fix.patch"
 
-    echo "CONFIG_BPF_STREAM_PARSER=y" >> "$config_file"
-    echo "CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y" >> "$config_file"
-    echo "CONFIG_NETFILTER_XT_SET=y" >> "$config_file"
-    echo "CONFIG_IP_SET=y" >> "$config_file"
-    echo "CONFIG_IP_SET_MAX=65534" >> "$config_file"
-    echo "CONFIG_IP_SET_BITMAP_IP=y" >> "$config_file"
-    echo "CONFIG_IP_SET_BITMAP_IPMAC=y" >> "$config_file"
-    echo "CONFIG_IP_SET_BITMAP_PORT=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IP=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IPMARK=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IPPORT=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IPPORTIP=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IPPORTNET=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_IPMAC=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_MAC=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_NET=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_NETNET=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_NETPORT=y" >> "$config_file"
-    echo "CONFIG_IP_SET_HASH_NETIFACE=y" >> "$config_file"
-    echo "CONFIG_IP_SET_LIST_SET=y" >> "$config_file"
-    echo "CONFIG_IP6_NF_NAT=y" >> "$config_file"
-    echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> "$config_file"
+    echo 'CONFIG_BPF_STREAM_PARSER=y' >> "$config_file"
+    echo 'CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y' >> "$config_file"
+    echo 'CONFIG_NETFILTER_XT_SET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_MAX=6534' >> "$config_file"
+    echo 'CONFIG_IP_SET_BITMAP_IP=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_BITMAP_IPMAC=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_BITMAP_PORT=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IP=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IPMARK=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IPPORT=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IPPORTIP=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IPPORTNET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_IPMAC=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_MAC=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_NETPORTNET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_NET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_NETNET=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_NETPORT=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_HASH_NETIFACE=y' >> "$config_file"
+    echo 'CONFIG_IP_SET_LIST_SET=y' >> "$config_file"
+    echo 'CONFIG_IP6_NF_NAT=y' >> "$config_file"
+    echo 'CONFIG_IP6_NF_TARGET_MASQUERADE=y' >> "$config_file"
 
     popd
 }
@@ -258,6 +277,7 @@ main() {
     patch_ogki
     defconfig_add_generic
 
+    [[ $BBR_ECN_ENABLED == true ]] && defconfig_add_bbr_ecn
     [[ $ZRAM_ENABLED == true ]] && patch_zram
 
     if [[ $SUKISU == true ]]; then
