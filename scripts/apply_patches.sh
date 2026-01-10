@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-add_generic_configs() {
+defconfig_add_generic() {
     pushd ./kernel_platform/common
 
     local config_file='./arch/arm64/configs/gki_defconfig'
@@ -11,14 +11,13 @@ add_generic_configs() {
     popd
 }
 
-apply_zram_patches() {
-    local kernel_version="${GKI_ABI:10}"
-
+patch_zram() {
     cp -r ./SukiSU_patch/other/zram/lz4k/include/linux/* ./kernel_platform/common/include/linux
     cp -r ./SukiSU_patch/other/zram/lz4k/lib/* ./kernel_platform/common/lib
     cp -r ./SukiSU_patch/other/zram/lz4k/crypto/* ./kernel_platform/common/crypto
     cp -r ./SukiSU_patch/other/zram/lz4k_oplus ./kernel_platform/common/lib
 
+    local kernel_version="${GKI_ABI:10}"
     cp ./SukiSU_patch/other/zram/zram_patch/$kernel_version/*.patch ./kernel_platform/common
 
     pushd ./kernel_platform/common
@@ -27,24 +26,7 @@ apply_zram_patches() {
     patch -p1 -F 3 < lz4kd.patch || true
     patch -p1 -F 3 < lz4k_oplus.patch || true
 
-    popd
-}
-
-apply_manual_hooks_patches() {
-    pushd ./kernel_platform/common
-
-    echo 'Patching manual hooks'
-    cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
-    patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
-
-    popd
-}
-
-add_zram_configs() {
-    pushd ./kernel_platform/common
-
-    local android_version="${GKI_ABI:0:9}"
-    local kernel_version="${GKI_ABI:10}"
+    # Modify defconfig
     local config_file='./arch/arm64/configs/gki_defconfig'
 
     if [[ $kernel_version == '5.10' ]]; then
@@ -70,6 +52,7 @@ add_zram_configs() {
         sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' $config_file
     fi
 
+    local android_version="${GKI_ABI:0:9}"
     if [[ $android_version == 'android14' || $android_version == 'android15' || $android_version == 'android16' ]]; then
         [[ -e './modules.bzl' ]] && sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' './modules.bzl'
 
@@ -96,7 +79,17 @@ add_zram_configs() {
     popd
 }
 
-add_sukisu_configs() {
+patch_manual_hooks() {
+    pushd ./kernel_platform/common
+
+    echo 'Patching manual hooks'
+    cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
+    patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
+
+    popd
+}
+
+defconfig_add_sukisu() {
     pushd ./kernel_platform/common
 
     local config_file='./arch/arm64/configs/gki_defconfig'
@@ -147,8 +140,9 @@ configure_kernel_name() {
     popd
 }
 
-apply_susfs_patches() {
+patch_susfs() {
     pushd ./kernel_platform
+
     cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-$GKI_ABI.patch ./common
     cp ../susfs4ksu/kernel_patches/fs/* ./common/fs
     cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux
@@ -226,21 +220,21 @@ main() {
 
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
 
-    add_generic_configs
+    defconfig_add_generic
 
-    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches && add_zram_configs
+    [[ $ZRAM_ENABLED == true ]] && patch_zram
 
     if [[ $SUKISU == true ]]; then
         case $SUKISU_HOOK in
             susfs)
-                apply_susfs_patches
+                patch_susfs
                 ;;
             manual)
-                apply_manual_hooks_patches
+                patch_manual_hooks
                 ;;
         esac
 
-        add_sukisu_configs
+        defconfig_add_sukisu
     fi
 
     [[ $SCHED_ENABLED == true ]] && add_sched
