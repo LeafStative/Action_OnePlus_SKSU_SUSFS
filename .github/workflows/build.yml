@@ -77,7 +77,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: python3 git curl
+          packages: python3 git curl dos2unix
           execute_install_scripts: true
 
       - name: Configure Git

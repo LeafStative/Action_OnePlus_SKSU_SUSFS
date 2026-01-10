@@ -1,31 +1,15 @@
 #!/usr/bin/bash
 
 check_environment() {
+    set -- 'python3' 'git' 'curl' 'unzip' 'jq' "$@"
+
     local result=0
-    if ! which python3 > /dev/null 2>&1; then
-        echo 'Python3 is not installed.'
-        result=1
-    fi
-
-    if ! which git > /dev/null 2>&1; then
-        echo 'Git is not installed.'
-        result=1
-    fi
-
-    if ! which curl > /dev/null 2>&1; then
-        echo 'Curl is not installed.'
-        result=1
-    fi
-
-    if ! which unzip > /dev/null 2>&1; then
-        echo 'Unzip is not installed.'
-        result=1
-    fi
-
-    if ! which jq > /dev/null 2>&1; then
-        echo 'Jq is not installed.'
-        result=1
-    fi
+    for binary in "$@"; do
+        if ! which "$binary" > /dev/null 2>&1; then
+            echo "$binary is not installed."
+            result=1
+        fi
+    done
 
     if [[ $result -ne 0 ]]; then
         echo 'Please install the missing dependencies.'
@@ -70,6 +54,20 @@ extract_gki_abi() {
     echo $branch
 
     [[ $branch ]] || return 1
+}
+
+extract_kernel_version() {
+    local makefile="$1/Makefile"
+
+    [[ ! -f $makefile ]] && return 1
+
+    local version=$(grep -m1 '^VERSION =' "$makefile" | cut -d= -f2 | tr -d ' ')
+    local patchlevel=$(grep -m1 '^PATCHLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
+    local sublevel=$(grep -m1 '^SUBLEVEL =' "$makefile" | cut -d= -f2 | tr -d ' ')
+
+    [[ ! $version || ! $patchlevel || ! $sublevel ]] && return 1
+
+    echo "${version}.${patchlevel}.${sublevel}"
 }
 
 patch_kpm() {

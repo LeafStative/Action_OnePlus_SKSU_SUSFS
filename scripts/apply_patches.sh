@@ -128,8 +128,23 @@ defconfig_add_sukisu() {
     popd
 }
 
-add_sched() {
-    cp -r ./sched_ext/* ./kernel_platform/common/kernel/sched
+patch_sched() {
+    local manifest_name=$(basename "$MANIFEST_FILE" .xml)
+
+    if [[ ! -f "./SCHED_PATCH/fengchi_${manifest_name}.patch" ]]; then
+        echo "No sched patch found for '$manifest_name'"
+        return 1
+    fi
+
+    cp "./SCHED_PATCH/fengchi_${manifest_name}.patch" ./kernel_platform/common
+
+    pushd ./kernel_platform/common
+
+    echo 'Patching SCHED'
+    dos2unix "fengchi_${manifest_name}.patch"
+    patch -p1 -F 3 < "fengchi_${manifest_name}.patch"
+
+    popd
 }
 
 configure_kernel_name() {
@@ -160,7 +175,7 @@ patch_susfs() {
     popd
 }
 
-add_baseband_guard_configs() {
+patch_baseband_guard() {
     sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' \
         ./kernel_platform/common/security/Kconfig
 
@@ -237,8 +252,8 @@ main() {
         defconfig_add_sukisu
     fi
 
-    [[ $SCHED_ENABLED == true ]] && add_sched
-    [[ $BASEBAND_GUARD_ENABLED == true ]] && add_baseband_guard_configs
+    [[ $SCHED_ENABLED == true ]] && patch_sched
+    [[ $BASEBAND_GUARD_ENABLED == true ]] && patch_baseband_guard
     [[ $NETFILTER_ENABLED == true ]] && patch_netfilter
 
     configure_kernel_name

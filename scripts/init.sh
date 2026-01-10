@@ -199,7 +199,7 @@ main() {
     parse_args $@
 
     check_args || exit 1
-    check_environment || exit 1
+    check_environment dos2unix || exit 1
 
     if [[ ! -f 'tools/repo' || ! -f 'tools/magiskboot' ]]; then
         echo "Tools not found, downloading..."

@@ -26,8 +26,7 @@ init_repo() {
 
 init_sched() {
     set -e
-    git clone https://github.com/HanKuCha/sched_ext --depth=1
-    rm -rf ./sched_ext/.git
+    git clone https://github.com/Numbersf/SCHED_PATCH --depth=1
     set +e
 }
 
