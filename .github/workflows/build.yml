@@ -13,11 +13,11 @@ on:
       file:
         description: 'Manifest file name'
         required: true
-        default: 'oneplus_ace2_v.xml'
+        default: 'oneplus_ace2_b.xml'
       kernel_suffix:
         description: 'Kernel suffix'
         required: true
-        default: '-android12-9-o-g4beca10de372-hath'
+        default: '-android12-9-o-g420fe2863fc1-hath'
       codename:
         description: 'CPU codename'
         required: true
