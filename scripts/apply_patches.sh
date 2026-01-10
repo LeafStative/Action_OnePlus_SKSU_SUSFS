@@ -1,5 +1,16 @@
 #!/usr/bin/bash
 
+add_generic_configs() {
+    pushd ./kernel_platform/common
+
+    local config_file='./arch/arm64/configs/gki_defconfig'
+
+    echo 'CONFIG_TMPFS_XATTR=y' >> $config_file
+    echo 'CONFIG_TMPFS_POSIX_ACL=y' >> $config_file
+
+    popd
+}
+
 apply_zram_patches() {
     local kernel_version="${GKI_ABI:10}"
 
@@ -179,6 +190,8 @@ main() {
     pushd workspace
 
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
+
+    add_generic_configs
 
     [[ $ZRAM_ENABLED == true ]] && apply_zram_patches && add_zram_configs
 
