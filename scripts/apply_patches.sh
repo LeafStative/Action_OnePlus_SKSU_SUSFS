@@ -7,12 +7,14 @@ apply_zram_patches() {
     cp -r ./SukiSU_patch/other/zram/lz4k/lib/* ./kernel_platform/common/lib
     cp -r ./SukiSU_patch/other/zram/lz4k/crypto/* ./kernel_platform/common/crypto
     cp -r ./SukiSU_patch/other/zram/lz4k_oplus ./kernel_platform/common/lib
-    cp ./SukiSU_patch/other/zram/zram_patch/$kernel_version/lz4kd.patch ./kernel_platform/common
+
+    cp ./SukiSU_patch/other/zram/zram_patch/$kernel_version/*.patch ./kernel_platform/common
 
     pushd ./kernel_platform/common
 
     echo 'Patching ZRAM'
     patch -p1 -F 3 < lz4kd.patch || true
+    patch -p1 -F 3 < lz4k_oplus.patch || true
 
     popd
 }
@@ -27,7 +29,7 @@ apply_manual_hooks_patches() {
     popd
 }
 
-add_lz4kd_configs() {
+add_zram_configs() {
     pushd ./kernel_platform/common
 
     local android_version="${GKI_ABI:0:9}"
@@ -42,7 +44,7 @@ add_lz4kd_configs() {
         echo 'CONFIG_ZRAM_DEF_COMP_LZ4KD=y' >> $config_file
     fi
 
-    if [[ $kernel_version != "6.6" ]] && [[ $kernel_version != "5.10" ]]; then
+    if [[ $kernel_version != "6.12" && $kernel_version != '6.6' && $kernel_version != "5.10" ]]; then
         if grep -q 'CONFIG_ZSMALLOC' -- $config_file; then
             sed -i 's/CONFIG_ZSMALLOC=m/CONFIG_ZSMALLOC=y/g' $config_file
         else
@@ -52,12 +54,12 @@ add_lz4kd_configs() {
         sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' $config_file
     fi
 
-    if [[ $kernel_version == '6.6' ]]; then
+    if [[ $kernel_version == '6.12' || $kernel_version == '6.6' ]]; then
         echo "CONFIG_ZSMALLOC=y" >> $config_file
         sed -i 's/CONFIG_ZRAM=m/CONFIG_ZRAM=y/g' $config_file
     fi
 
-    if [[ $android_version == 'android14' || $android_version == 'android15' ]]; then
+    if [[ $android_version == 'android14' || $android_version == 'android15' || $android_version == 'android16' ]]; then
         [[ -e './modules.bzl' ]] && sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' './modules.bzl'
 
         if [[ -e '../msm-kernel/modules.bzl' ]]; then
@@ -178,7 +180,7 @@ main() {
 
     GKI_ABI=$(extract_gki_abi ./kernel_platform/common)
 
-    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches && add_lz4kd_configs
+    [[ $ZRAM_ENABLED == true ]] && apply_zram_patches && add_zram_configs
 
     if [[ $SUKISU == true ]]; then
         case $SUKISU_HOOK in
