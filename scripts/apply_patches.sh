@@ -228,6 +228,8 @@ patch_netfilter() {
     # MediaTek SoCs does not need this patch.
     patch -p1 -F 3 "${PATCHES_DIR}/ipv6-fix.patch"
 
+    local config_file='./arch/arm64/configs/gki_defconfig'
+
     echo 'CONFIG_BPF_STREAM_PARSER=y' >> "$config_file"
     echo 'CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y' >> "$config_file"
     echo 'CONFIG_NETFILTER_XT_SET=y' >> "$config_file"
