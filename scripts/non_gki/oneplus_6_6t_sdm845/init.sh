@@ -148,7 +148,7 @@ check_args() {
 }
 
 main() {
-    local script_dir=$(realpath "$0/../../..")
+    local script_dir=$(realpath "$(dirname "$0")/../..")
     source "$script_dir/lib/utils.sh"
 
     parse_args $@
