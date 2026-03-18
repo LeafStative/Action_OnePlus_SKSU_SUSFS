@@ -234,7 +234,7 @@ patch_netfilter() {
     echo 'CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y' >> "$config_file"
     echo 'CONFIG_NETFILTER_XT_SET=y' >> "$config_file"
     echo 'CONFIG_IP_SET=y' >> "$config_file"
-    echo 'CONFIG_IP_SET_MAX=6534' >> "$config_file"
+    echo 'CONFIG_IP_SET_MAX=65534' >> "$config_file"
     echo 'CONFIG_IP_SET_BITMAP_IP=y' >> "$config_file"
     echo 'CONFIG_IP_SET_BITMAP_IPMAC=y' >> "$config_file"
     echo 'CONFIG_IP_SET_BITMAP_PORT=y' >> "$config_file"
