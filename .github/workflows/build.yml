@@ -38,7 +38,7 @@ on:
         type: boolean
         default: true
       sukisu_enable:
-        description: "Enable SukiSU-Ultra"
+        description: "Enable ReSukiSU"
         required: true
         type: boolean
         default: true

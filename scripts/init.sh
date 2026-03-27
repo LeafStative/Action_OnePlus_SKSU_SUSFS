@@ -17,13 +17,13 @@ USAGE: $0 [OPTION ...]
       -n, --netfilter              (bool) Integrate Netfilter patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
-      -k, --sukisu                 (bool) Integrate SukiSU-Ultra to kernel (default false).
-      -v, --sukisu-version <name>  Custom SukiSU-Ultra version string (optional).
+      -k, --sukisu                 (bool) Integrate ReSukiSU to kernel (default false).
+      -v, --sukisu-version <name>  Custom ReSukiSU version string (optional).
       -K, --sukisu-kpm <value>     KernelPatch module support.
                                      full
                                      compile-only
                                      none (default)
-      -H, --sukisu-hook <hook>     Sukisu-Ultra hook type selection, available options:
+      -H, --sukisu-hook <hook>     ReSukiSU hook type selection, available options:
                                      susfs (default)
                                      manual
                                      kprobes
@@ -168,17 +168,17 @@ check_args() {
 
     if [[ $SUKISU != true ]]; then
         if [[ $SUKISU_KPM ]]; then
-            echo "KernelPatch module support enabled, but SukiSU-Ultra not enabled, ignored."
+            echo "KernelPatch module support enabled, but ReSukiSU not enabled, ignored."
             unset SUKISU_VER
         fi
 
         if [[ $SUKISU_VER ]]; then
-            echo "Custom SukiSU-Ultra version '$SUKISU_VER' specified, but SukiSU-Ultra not enabled, ignored."
+            echo "Custom ReSukiSU version '$SUKISU_VER' specified, but ReSukiSU not enabled, ignored."
             unset SUKISU_VER
         fi
 
         if [[ $SUKISU_HOOK ]]; then
-            echo "SukiSU-Ultra hook type '$SUKISU_HOOK' specified, but SukiSU-Ultra not enabled, ignored."
+            echo "ReSukiSU hook type '$SUKISU_HOOK' specified, but ReSukiSU not enabled, ignored."
             unset SUKISU_HOOK
         fi
     else
@@ -188,7 +188,7 @@ check_args() {
         fi
 
         if [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
-            echo "Invalid SukiSU-Ultra hook type '$SUKISU_HOOK'."
+            echo "Invalid ReSukiSU hook type '$SUKISU_HOOK'."
             result=1
         fi
     fi

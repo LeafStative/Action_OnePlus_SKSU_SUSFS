@@ -134,8 +134,8 @@ defconfig_add_sukisu() {
     local config_file='./arch/arm64/configs/gki_defconfig'
 
     echo 'CONFIG_KSU=y' >> $config_file
-    echo 'CONFIG_KSU_MANUAL_SU=y' >> $config_file
 
+    [[ $SUKISU_VER ]] && echo "CONFIG_KSU_FULL_NAME_FORMAT=$SUKISU_VER" >> $config_file
     [[ $SUKISU_KPM == 'full' || $SUKISU_KPM == 'compile-only' ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     case "$SUKISU_HOOK" in
@@ -143,11 +143,10 @@ defconfig_add_sukisu() {
             echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
             ;;
         kprobes)
-            echo 'CONFIG_KSU_SYACALL_HOOK=y' >> $config_file
-            echo 'CONFIG_KPROBES=y' >> $config_file
+            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
             ;;
         susfs)
-            echo 'CONFIG_KSU_NONE_HOOK=y' >> $config_file
+            echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
 
             echo 'CONFIG_KSU_SUSFS=y' >> $config_file
             echo 'CONFIG_KSU_SUSFS_SUS_PATH=y' >> $config_file

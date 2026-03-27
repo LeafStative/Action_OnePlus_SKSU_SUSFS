@@ -34,14 +34,9 @@ init_sukisu() {
     set -e
     pushd ./kernel_platform
 
-    curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
+    curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash -s main
 
     pushd ./KernelSU
-
-    if [[ $SUKISU_VER ]]; then
-        sed -i 's/DKSU_VERSION_FULL=\\"\$(KSU_VERSION_FULL)\\"/DKSU_VERSION_FULL=\\"'"$SUKISU_VER"'\\"/' kernel/Makefile
-        echo "Custom SukiSU-Ultra version: $SUKISU_VER"
-    fi
 
     popd
     popd
