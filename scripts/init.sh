@@ -26,7 +26,7 @@ USAGE: $0 [OPTION ...]
       -H, --sukisu-hook <hook>     ReSukiSU hook type selection, available options:
                                      susfs (default)
                                      manual
-                                     kprobes
+                                     tracepoint
 EOF
 }
 

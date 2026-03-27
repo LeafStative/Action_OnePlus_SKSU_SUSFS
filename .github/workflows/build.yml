@@ -59,7 +59,7 @@ on:
         options:
           - susfs
           - manual
-          - kprobes
+          - tracepoint
 
 permissions: 
   contents: read
@@ -141,9 +141,9 @@ jobs:
                 args+=' -H manual'
                 output_string+='_MANUAL'
                 ;;
-              kprobes)
-                args+=' -H kprobes'
-                output_string+='_KPROBES'
+              tracepoint)
+                args+=' -H tracepoint'
+                output_string+='_TRACEPOINT'
                 ;;
             esac
           fi

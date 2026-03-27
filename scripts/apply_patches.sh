@@ -142,7 +142,7 @@ defconfig_add_sukisu() {
         manual)
             echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
             ;;
-        kprobes)
+        tracepoint)
             echo 'CONFIG_KSU_MANUAL_HOOK=n' >> $config_file
             ;;
         susfs)

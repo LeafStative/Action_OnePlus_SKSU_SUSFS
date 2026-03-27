@@ -32,7 +32,7 @@ check_kpm_support() {
 
 check_sukisu_hook() {
     case "$1" in
-        susfs|manual|kprobes)
+        susfs|manual|tracepoint)
             return 0
             ;;
         *)
