@@ -21,8 +21,10 @@ main() {
         exit 1
     fi
 
-    if [[ -f 'AnyKernel3.zip' ]]; then
-        echo -n 'AnyKernel3.zip already exists. Do you want to overwrite it? (y/N): '
+    local file_name=[[ $1 ]] && echo "$1.zip" || echo 'AnyKernel3.zip'
+
+    if [[ -f $file_name ]]; then
+        echo -n "'$file_name' already exists. Do you want to overwrite it? (y/N): "
 
         local answer
         read -r answer
@@ -44,15 +46,15 @@ main() {
     cp $image_path ./AnyKernel3/
     cp "$patches_dir/anykernel.sh" ./AnyKernel3/
 
-    [[ $overwrite == true ]] && rm AnyKernel3.zip
+    [[ $overwrite == true ]] && rm "$file_name"
 
     pushd AnyKernel3
-    zip -rv ../AnyKernel3.zip *
+    zip -rv "../$file_name" *
     popd
 
     popd
 
-    echo 'AnyKernel3 archive saved to AnyKernel3.zip'
+    echo "AnyKernel3 archive saved to '$file_name'"
 }
 
 main
