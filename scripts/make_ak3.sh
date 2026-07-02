@@ -18,7 +18,7 @@ main() {
         exit 1
     fi
 
-    local file_name=[[ $1 ]] && echo "$1.zip" || echo 'AnyKernel3.zip'
+    local file_name=$([[ $1 ]] && echo "$1.zip" || echo 'AnyKernel3.zip')
 
     if [[ -f $file_name ]]; then
         echo -n "'$file_name' already exists. Do you want to overwrite it? (y/N): "
