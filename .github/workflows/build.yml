@@ -215,7 +215,7 @@ jobs:
           archive: false
 
       - name: Upload to Telegram
-        if: ${{ inputs.upload_telegram == 'true' }}
+        if: inputs.upload_telegram
         uses: xz-dev/TelegramFileUploader@v1
         with:
           to-who: ${{ secrets.TELEGRAM_CHAT_ID }}
