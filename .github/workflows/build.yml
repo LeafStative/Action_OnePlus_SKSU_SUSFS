@@ -199,7 +199,7 @@ jobs:
             ./workspace/artifacts/AnyKernel3${{ steps.pre_upload.outputs.filename_suffix }}.zip
             ./workspace/artifacts/Image${{ steps.pre_upload.outputs.filename_suffix }}
           message: |
-            New kernel build.
+            New GKI kernel build!
 
             **Repository:** ${{ inputs.repo }}
             **Branch:** ${{ inputs.branch }}
