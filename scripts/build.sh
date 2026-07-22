@@ -40,8 +40,6 @@ main() {
     local kernel_version=$(strings out/dist/Image | grep -oP '(?<=Linux version )\d\S+')
     echo "Kernel version: $kernel_version"
 
-    [[ $SUKISU_KPM == 'full' ]] && patch_kpm ./SukiSU_patch/kpm/patch_linux ./out/dist
-
     popd
 
     echo Build successful

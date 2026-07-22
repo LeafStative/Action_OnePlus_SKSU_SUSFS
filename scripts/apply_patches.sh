@@ -136,7 +136,6 @@ defconfig_add_sukisu() {
     echo 'CONFIG_KSU=y' >> $config_file
 
     [[ $SUKISU_VER ]] && echo "CONFIG_KSU_FULL_NAME_FORMAT=$SUKISU_VER" >> $config_file
-    [[ $SUKISU_KPM == 'full' || $SUKISU_KPM == 'compile-only' ]] && echo 'CONFIG_KPM=y' >> $config_file
 
     case "$SUKISU_HOOK" in
         manual)

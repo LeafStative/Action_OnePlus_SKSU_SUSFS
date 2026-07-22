@@ -19,10 +19,6 @@ USAGE: $0 [OPTION ...]
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
       -k, --sukisu                 (bool) Integrate ReSukiSU to kernel (default false).
       -v, --sukisu-version <name>  Custom ReSukiSU version string (optional).
-      -K, --sukisu-kpm <value>     KernelPatch module support.
-                                     full
-                                     compile-only
-                                     none (default)
       -H, --sukisu-hook <hook>     ReSukiSU hook type selection, available options:
                                      susfs (default)
                                      manual
@@ -31,8 +27,8 @@ EOF
 }
 
 parse_args() {
-    local args=$(getopt -o hr:b:f:s:c:zenSBkv:K:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,bbr-ecn,netfilter,sched,baseband-guard,sukisu,sukisu-version:,sukisu-kpm:,sukisu-hook: \
+    local args=$(getopt -o hr:b:f:s:c:zenSBkv:H: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,bbr-ecn,netfilter,sched,baseband-guard,sukisu,sukisu-version:,sukisu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -95,10 +91,6 @@ parse_args() {
                 SUKISU_VER="$2"
                 shift 2
                 ;;
-            -K|--sukisu-kpm)
-                SUKISU_KPM="$2"
-                shift 2
-                ;;
             -H|--sukisu-hook)
                 SUKISU_HOOK="$2"
                 shift 2
@@ -137,7 +129,6 @@ EOF
     if [[ $SUKISU == true ]]; then
         echo -e '\nSUKISU=true' >> repo.conf
 
-        [[ $SUKISU_KPM ]] && echo "SUKISU_KPM=$SUKISU_KPM" >> repo.conf
         [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
         [[ $SUKISU_HOOK ]] && echo "SUKISU_HOOK=$SUKISU_HOOK" >> repo.conf
     fi
@@ -167,11 +158,6 @@ check_args() {
     fi
 
     if [[ $SUKISU != true ]]; then
-        if [[ $SUKISU_KPM ]]; then
-            echo "KernelPatch module support enabled, but ReSukiSU not enabled, ignored."
-            unset SUKISU_VER
-        fi
-
         if [[ $SUKISU_VER ]]; then
             echo "Custom ReSukiSU version '$SUKISU_VER' specified, but ReSukiSU not enabled, ignored."
             unset SUKISU_VER
@@ -182,11 +168,6 @@ check_args() {
             unset SUKISU_HOOK
         fi
     else
-        if [[ $SUKISU_KPM ]] && ! check_kpm_support "$SUKISU_KPM"; then
-            echo "Invalid KernelPatch module support value '$SUKISU_KPM'."
-            result=1
-        fi
-
         if [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
             echo "Invalid ReSukiSU hook type '$SUKISU_HOOK'."
             result=1

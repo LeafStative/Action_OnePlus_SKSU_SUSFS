@@ -30,8 +30,8 @@ main() {
         exit 1
     fi
 
-    pushd workspace
-    pushd android_kernel
+    pushd workspace/android_kernel
+
     make \
         O=../out \
         clean \
@@ -56,10 +56,6 @@ main() {
 
     local kernel_version=$(strings $image_path | grep -oP '(?<=Linux version )\d\S+')
     echo "Kernel version: $kernel_version"
-
-    popd
-
-    [[ $SUKISU_KPM == 'full' ]] && patch_kpm ./SukiSU_patch/kpm/patch_linux "$(dirname "$image_path")"
 
     popd
 

@@ -42,15 +42,6 @@ on:
         required: true
         type: boolean
         default: true
-      kpm:
-        description: "KernelPatch module support"
-        required: true
-        type: choice
-        default: full
-        options:
-          - full
-          - compile-only
-          - none
       sukisu_hook:
         description: 'SUSFS / Hook type selection'
         required: true
@@ -126,17 +117,6 @@ jobs:
           if [[ '${{ inputs.sukisu_enable }}' == true ]]; then
             args+=' -k'
             output_string+='_SKSU'
-
-            case '${{ inputs.kpm }}' in
-              full)
-                args+=' -K full'
-                output_string+='_KPM'
-                ;;
-              compile-only)
-                args+=' -K compile-only'
-                output_string+='_KPMCO'
-                ;;
-            esac
 
             case '${{ inputs.sukisu_hook }}' in
               susfs)
@@ -235,7 +215,6 @@ jobs:
             **Netfilter:** ${{ inputs.netfilter }}
             **BBG:** ${{ inputs.baseband_guard_enable }}
             **ReSukiSU:** ${{ inputs.sukisu_enable }}
-            **KPM:** ${{ inputs.kpm }}
             **SuSFS/Hook Type:** ${{ inputs.sukisu_hook }}
         env:
           API_ID: ${{ secrets.TELEGRAM_API_ID }}

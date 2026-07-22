@@ -19,17 +19,6 @@ check_environment() {
     return 0
 }
 
-check_kpm_support() {
-    case "$1" in
-        full|compile-only|none)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
 check_sukisu_hook() {
     case "$1" in
         susfs|manual|tracepoint)
@@ -75,24 +64,4 @@ extract_kernel_version() {
     [[ ! $sublevel ]] && return 1
 
     echo "${version}.${patchlevel}.${sublevel}"
-}
-
-patch_kpm() {
-    local patch_binary="$1"
-    local image_dir="$2"
-
-    echo 'KernelPatch module enabled, patching kernel image'
-
-    cp "$patch_binary" "$image_dir"
-    pushd $image_dir
-
-    chmod a+x ./patch_linux
-    ./patch_linux
-
-    mv Image Image.bak
-    mv oImage Image
-
-    echo 'Kernel image patched'
-
-    popd
 }
