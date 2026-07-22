@@ -65,7 +65,7 @@ jobs:
           git config --global user.email "leafstative@gmail.com"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Configure init arguments
         id: init_args
@@ -130,13 +130,13 @@ jobs:
           ./scripts/non_gki/oneplus_6_6t_sdm845/make_ak3.sh
 
       - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: 'AnyKernel3${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_suffix }}'
           path: ./workspace/AnyKernel3/*
 
       - name: Upload kernel
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: 'Image${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_suffix }}'
           path: ./workspace/AnyKernel3/Image

@@ -87,7 +87,7 @@ jobs:
           git config --global user.email "leafstative@gmail.com"
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configure init arguments
         id: init_args
