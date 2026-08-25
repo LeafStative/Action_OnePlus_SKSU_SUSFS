@@ -199,7 +199,7 @@ patch_susfs() {
     cp ../susfs4ksu/kernel_patches/fs/* ./common/fs
     cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux
 
-    cp ../SukiSU_patch/69_hide_stuff.patch ./common
+    cp "$PATCHES_DIR/69_hide_stuff.patch" ./common
 
     pushd ./common
     echo 'Patching SUSFS'
