@@ -4,14 +4,14 @@ main() {
     mkdir -p workspace/artifacts
     pushd workspace
 
-    echo "Downloading ReSukiSU manager apks..."
+    echo "Downloading BakaSU manager apks..."
 
-    curl -LO https://nightly.link/ReSukiSU/ReSukiSU/workflows/build-manager/main/Manager-release.zip
+    curl -LO https://nightly.link/Baka-SU/BakaSU/workflows/build-manager/main/Manager-release.zip
     unzip -od artifacts Manager-release.zip
 
     popd
 
-    echo "ReSukiSU manager apks saved to '$(realpath artifacts)'"
+    echo "BakaSU manager apks saved to '$(realpath artifacts)'"
 }
 
 main

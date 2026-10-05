@@ -37,12 +37,12 @@ on:
         required: true
         type: boolean
         default: true
-      sukisu_enable:
-        description: "Enable ReSukiSU"
+      bakasu_enable:
+        description: "Enable BakaSU"
         required: true
         type: boolean
         default: true
-      sukisu_hook:
+      bakasu_hook:
         description: 'SUSFS / Hook type selection'
         required: true
         type: choice
@@ -114,11 +114,11 @@ jobs:
             output_string+='_BBG'
           fi
 
-          if [[ '${{ inputs.sukisu_enable }}' == true ]]; then
+          if [[ '${{ inputs.bakasu_enable }}' == true ]]; then
             args+=' -k'
-            output_string+='_SKSU'
+            output_string+='_BKSU'
 
-            case '${{ inputs.sukisu_hook }}' in
+            case '${{ inputs.bakasu_hook }}' in
               susfs)
                 output_string+='_SUSFS'
                 ;;
@@ -156,14 +156,14 @@ jobs:
       - name: Make AnyKernel3
         run: ./scripts/make_ak3.sh
 
-      - name: Download ReSukiSU Manager
+      - name: Download BakaSU Manager
         run: ./scripts/download_manager.sh
 
       - name: Prepare files for upload
         id: pre_upload
         run: |
           filename_suffix='${{ steps.init_args.outputs.output_string }}${{ inputs.kernel_suffix }}'
-          manager_file=$(find ./workspace/artifacts -name "ReSukiSU_*-arm64-v8a-release.apk" | head -n 1)
+          manager_file=$(find ./workspace/artifacts -name "BakaSU_*-arm64-v8a-release.apk" | head -n 1)
 
           cp ./workspace/AnyKernel3.zip "./workspace/artifacts/AnyKernel3${filename_suffix}.zip"
           cp ./workspace/out/dist/Image "./workspace/artifacts/Image${filename_suffix}"
@@ -171,7 +171,7 @@ jobs:
           echo "filename_suffix=${filename_suffix}" >> $GITHUB_OUTPUT
           echo "manager_file=${manager_file}" >> $GITHUB_OUTPUT
 
-      - name: Upload ReSukiSU Manager
+      - name: Upload BakaSU Manager
         uses: actions/upload-artifact@v7
         with:
           path: ${{ steps.pre_upload.outputs.manager_file }}
@@ -209,8 +209,8 @@ jobs:
             **BBR+ECN:** ${{ inputs.bbr_ecn }}
             **Netfilter:** ${{ inputs.netfilter }}
             **BBG:** ${{ inputs.baseband_guard_enable }}
-            **ReSukiSU:** ${{ inputs.sukisu_enable }}
-            **SuSFS/Hook Type:** ${{ inputs.sukisu_hook }}
+            **BakaSU:** ${{ inputs.bakasu_enable }}
+            **SuSFS/Hook Type:** ${{ inputs.bakasu_hook }}
         env:
           API_ID: ${{ secrets.TELEGRAM_API_ID }}
           API_HASH: ${{ secrets.TELEGRAM_API_HASH }}

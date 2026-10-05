@@ -30,11 +30,11 @@ init_sched() {
     set +e
 }
 
-init_sukisu() {
+init_bakasu() {
     set -e
     pushd ./kernel_platform
 
-    curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash -s main
+    curl -LSs "https://raw.githubusercontent.com/Baka-SU/BakaSU/main/kernel/setup.sh" | bash -s main
 
     pushd ./KernelSU
 
@@ -69,7 +69,7 @@ main() {
     source "$script_dir/lib/utils.sh"
 
     REPO_URL='https://github.com/OnePlusOSS/kernel_manifest'
-    SUKISU_HOOK=susfs
+    BAKASU_HOOK=susfs
     source repo.conf
 
     mkdir -p workspace
@@ -80,10 +80,10 @@ main() {
     [[ $SCHED_ENABLED == true ]] && init_sched
     [[ $BASEBAND_GUARD_ENABLED == true ]] && init_baseband_guard
 
-    if [[ $SUKISU == true ]]; then
-        init_sukisu
+    if [[ $BAKASU == true ]]; then
+        init_bakasu
 
-        [[ $SUKISU_HOOK == 'susfs' ]] && init_susfs
+        [[ $BAKASU_HOOK == 'susfs' ]] && init_susfs
     fi
 
     popd

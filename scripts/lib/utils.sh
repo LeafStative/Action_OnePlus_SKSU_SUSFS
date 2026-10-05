@@ -19,7 +19,7 @@ check_environment() {
     return 0
 }
 
-check_sukisu_hook() {
+check_bakasu_hook() {
     case "$1" in
         susfs|manual|tracepoint)
             return 0

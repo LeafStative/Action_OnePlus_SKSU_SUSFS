@@ -128,16 +128,16 @@ patch_manual_hooks() {
     popd
 }
 
-defconfig_add_sukisu() {
+defconfig_add_bakasu() {
     pushd ./kernel_platform/common
 
     local config_file='./arch/arm64/configs/gki_defconfig'
 
     echo 'CONFIG_KSU=y' >> $config_file
 
-    [[ $SUKISU_VER ]] && echo "CONFIG_KSU_FULL_NAME_FORMAT=$SUKISU_VER" >> $config_file
+    [[ $BAKASU_VER ]] && echo "CONFIG_KSU_FULL_NAME_FORMAT=$BAKASU_VER" >> $config_file
 
-    case "$SUKISU_HOOK" in
+    case "$BAKASU_HOOK" in
         manual)
             echo 'CONFIG_KSU_MANUAL_HOOK=y' >> $config_file
             ;;
@@ -259,7 +259,7 @@ main() {
     local script_dir=$(dirname $(realpath "$0"))
     source "$script_dir/lib/utils.sh"
 
-    SUKISU_HOOK=susfs
+    BAKASU_HOOK=susfs
     source repo.conf
 
     PATCHES_DIR=$(realpath ./patches)
@@ -280,8 +280,8 @@ main() {
     [[ $BBR_ECN_ENABLED == true ]] && defconfig_add_bbr_ecn
     [[ $ZRAM_ENABLED == true ]] && patch_zram
 
-    if [[ $SUKISU == true ]]; then
-        case $SUKISU_HOOK in
+    if [[ $BAKASU == true ]]; then
+        case $BAKASU_HOOK in
             susfs)
                 patch_susfs
                 ;;
@@ -290,7 +290,7 @@ main() {
                 ;;
         esac
 
-        defconfig_add_sukisu
+        defconfig_add_bakasu
     fi
 
     [[ $SCHED_ENABLED == true ]] && patch_sched

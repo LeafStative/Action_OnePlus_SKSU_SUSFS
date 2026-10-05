@@ -17,9 +17,9 @@ USAGE: $0 [OPTION ...]
       -n, --netfilter              (bool) Integrate Netfilter patches (default false).
       -S, --sched                  (bool) Integrate sched_ext to kernel (default false, SoCs other than sm8750 may not work).
       -B, --baseband-guard         (bool) Integrate Baseband-guard to kernel (default false).
-      -k, --sukisu                 (bool) Integrate ReSukiSU to kernel (default false).
-      -v, --sukisu-version <name>  Custom ReSukiSU version string (optional).
-      -H, --sukisu-hook <hook>     ReSukiSU hook type selection, available options:
+      -k, --bakasu                 (bool) Integrate BakaSU to kernel (default false).
+      -v, --bakasu-version <name>  Custom BakaSU version string (optional).
+      -H, --bakasu-hook <hook>     BakaSU hook type selection, available options:
                                      susfs (default)
                                      manual
                                      tracepoint
@@ -28,7 +28,7 @@ EOF
 
 parse_args() {
     local args=$(getopt -o hr:b:f:s:c:zenSBkv:H: \
-    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,bbr-ecn,netfilter,sched,baseband-guard,sukisu,sukisu-version:,sukisu-hook: \
+    -l help,repo:,branch:,file:,kernel-suffix:,codename:,zram,bbr-ecn,netfilter,sched,baseband-guard,bakasu,bakasu-version:,bakasu-hook: \
     -n "$0" -- "$@")
 
     if ! eval set -- "$args"; then
@@ -83,16 +83,16 @@ parse_args() {
                 BASEBAND_GUARD_ENABLED=true
                 shift 1
                 ;;
-            -k|--sukisu)
-                SUKISU=true
+            -k|--bakasu)
+                BAKASU=true
                 shift 1
                 ;;
-            -v|--sukisu-version)
-                SUKISU_VER="$2"
+            -v|--bakasu-version)
+                BAKASU_VER="$2"
                 shift 2
                 ;;
-            -H|--sukisu-hook)
-                SUKISU_HOOK="$2"
+            -H|--bakasu-hook)
+                BAKASU_HOOK="$2"
                 shift 2
                 ;;
 
@@ -126,11 +126,11 @@ EOF
     [[ $SCHED_ENABLED == true ]] && echo 'SCHED_ENABLED=true' >> repo.conf
     [[ $BASEBAND_GUARD_ENABLED == true ]] && echo 'BASEBAND_GUARD_ENABLED=true' >> repo.conf
 
-    if [[ $SUKISU == true ]]; then
-        echo -e '\nSUKISU=true' >> repo.conf
+    if [[ $BAKASU == true ]]; then
+        echo -e '\nBAKASU=true' >> repo.conf
 
-        [[ $SUKISU_VER ]] && echo "SUKISU_VER=$SUKISU_VER" >> repo.conf
-        [[ $SUKISU_HOOK ]] && echo "SUKISU_HOOK=$SUKISU_HOOK" >> repo.conf
+        [[ $BAKASU_VER ]] && echo "BAKASU_VER=$BAKASU_VER" >> repo.conf
+        [[ $BAKASU_HOOK ]] && echo "BAKASU_HOOK=$BAKASU_HOOK" >> repo.conf
     fi
 }
 
@@ -157,19 +157,19 @@ check_args() {
         result=1
     fi
 
-    if [[ $SUKISU != true ]]; then
-        if [[ $SUKISU_VER ]]; then
-            echo "Custom ReSukiSU version '$SUKISU_VER' specified, but ReSukiSU not enabled, ignored."
-            unset SUKISU_VER
+    if [[ $BAKASU != true ]]; then
+        if [[ $BAKASU_VER ]]; then
+            echo "Custom BakaSU version '$BAKASU_VER' specified, but BakaSU not enabled, ignored."
+            unset BAKASU_VER
         fi
 
-        if [[ $SUKISU_HOOK ]]; then
-            echo "ReSukiSU hook type '$SUKISU_HOOK' specified, but ReSukiSU not enabled, ignored."
-            unset SUKISU_HOOK
+        if [[ $BAKASU_HOOK ]]; then
+            echo "BakaSU hook type '$BAKASU_HOOK' specified, but BakaSU not enabled, ignored."
+            unset BAKASU_HOOK
         fi
     else
-        if [[ $SUKISU_HOOK ]] && ! check_sukisu_hook "$SUKISU_HOOK"; then
-            echo "Invalid ReSukiSU hook type '$SUKISU_HOOK'."
+        if [[ $BAKASU_HOOK ]] && ! check_bakasu_hook "$BAKASU_HOOK"; then
+            echo "Invalid BakaSU hook type '$BAKASU_HOOK'."
             result=1
         fi
     fi
